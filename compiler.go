@@ -1317,7 +1317,9 @@ func (c *compiler) enterDummyMode() (leaveFunc func()) {
 			breaking: savedBlock.breaking,
 		}
 	}
-	c.p = &Program{}
+	c.p = &Program{
+		src: c.p.src,
+	}
 	c.newScope()
 	return func() {
 		c.block, c.p = savedBlock, savedProgram

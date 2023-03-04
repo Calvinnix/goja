@@ -4,6 +4,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/dop251/goja/file"
 	"github.com/dop251/goja/parser"
 	"github.com/dop251/goja/unistring"
 )
@@ -23,6 +24,7 @@ func TestVM1(t *testing.T) {
 	vm := r.vm
 
 	vm.prg = &Program{
+		src:    file.NewFile("dummy", "", 1),
 		values: []Value{valueInt(2), valueInt(3), asciiString("test")},
 		code: []instruction{
 			&bindGlobal{vars: []unistring.String{"v"}},
