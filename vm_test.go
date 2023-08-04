@@ -6,6 +6,7 @@ import (
 
 	"github.com/dop251/goja/parser"
 	"github.com/dop251/goja/unistring"
+	"golang.org/x/time/rate"
 )
 
 func TestTaggedTemplateArgExport(t *testing.T) {
@@ -229,6 +230,7 @@ func BenchmarkEmptyLoop(b *testing.B) {
 	`
 	b.StopTimer()
 	vm := New()
+	vm.SetRateLimiter(rate.NewLimiter(rate.Limit(10_000_000), 250_000))
 	prg := MustCompile("test.js", SCRIPT, false)
 	// prg.dumpCode(log.Printf)
 	b.StartTimer()

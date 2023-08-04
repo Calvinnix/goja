@@ -21,9 +21,6 @@ func (self *Runtime) SetRateLimiter(limiter *rate.Limiter) {
 // function since it gets called millions of times per second.
 func (self *Runtime) waitOneTick() {
 	self.ticks++
-	if self.limiter == nil {
-		return
-	}
 
 	if self.limiterTicksLeft > 0 {
 		self.limiterTicksLeft--
