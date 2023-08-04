@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -544,7 +543,6 @@ func (vm *vm) init() {
 func (vm *vm) run() {
 	vm.halt = false
 	interrupted := false
-	ticks := 0
 	for !vm.halt {
 		vm.r.waitOneTick()
 		if interrupted = atomic.LoadUint32(&vm.interrupted) != 0; interrupted {
@@ -583,11 +581,6 @@ func (vm *vm) run() {
 			}()
 		} else {
 			vm.prg.code[vm.pc].exec(vm)
-		}
-		ticks++
-		if ticks > 10000 {
-			runtime.Gosched()
-			ticks = 0
 		}
 	}
 
