@@ -505,7 +505,7 @@ func (r *Runtime) init() {
 		configurable: true,
 	})
 
-	r.SetRateLimiter(rate.NewLimiter(rate.Inf, 1))
+	r.SetRateLimiter(rate.NewLimiter(rate.Inf, maxInt))
 }
 
 func (r *Runtime) typeErrorResult(throw bool, args ...interface{}) {
