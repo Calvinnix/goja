@@ -504,6 +504,8 @@ func (r *Runtime) init() {
 		accessor:     true,
 		configurable: true,
 	})
+
+	r.SetRateLimiter(rate.NewLimiter(rate.Inf, 1))
 }
 
 func (r *Runtime) typeErrorResult(throw bool, args ...interface{}) {
