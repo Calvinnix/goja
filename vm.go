@@ -586,7 +586,6 @@ func (vm *vm) run() {
 	vm.halt = false
 	interrupted := false
 	for !vm.halt {
-		// start: wait one tick
 		// NOTE: we should try to avoid making expensive operations within this
 		// loop since it gets called millions of times per second.
 		vm.r.ticks++
@@ -613,7 +612,6 @@ func (vm *vm) run() {
 				panic(waitErr)
 			}
 		}
-		// end: wait one tick
 
 		if interrupted = atomic.LoadUint32(&vm.interrupted) != 0; interrupted {
 			vm.interruptLock.Lock()
