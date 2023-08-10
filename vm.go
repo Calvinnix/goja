@@ -308,8 +308,6 @@ type vm struct {
 	interruptVal  interface{}
 	interruptLock sync.Mutex
 
-	curAsyncRunner *asyncRunner
-
 	profTracker *profTracker
 }
 
