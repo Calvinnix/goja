@@ -7,7 +7,7 @@ import (
 // SetRateLimiter sets the rate limiter
 func (self *Runtime) SetRateLimiter(limiter *rate.Limiter) {
 	if limiter == nil {
-		return
+		limiter = rate.NewLimiter(rate.Inf, maxInt)
 	}
 	self.limiter = limiter
 	self.fillBucket()
