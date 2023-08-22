@@ -11,7 +11,7 @@ import (
 	"github.com/google/pprof/profile"
 )
 
-const profInterval = 10 * time.Millisecond
+const profInterval = 1 * time.Millisecond
 const profMaxStackDepth = 64
 
 const (
