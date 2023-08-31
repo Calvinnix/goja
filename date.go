@@ -2,6 +2,7 @@ package goja
 
 import (
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -102,7 +103,7 @@ func dateParse(date string) (time.Time, bool) {
 
 func (r *Runtime) newDateObject(t time.Time, isSet bool, proto *Object) *Object {
 	v := &Object{runtime: r}
-	d := &dateObject{}
+	d := dateObjectPool.Get().(*dateObject)
 	v.self = d
 	d.val = v
 	d.class = classDate
@@ -186,4 +187,23 @@ func (d *dateObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, newMemUsag
 	inc, newInc, err := d.baseObject.MemUsage(ctx)
 
 	return memUsage + inc, newMemUsage + newInc, err
+}
+
+var dateObjectPool = sync.Pool{
+	New: func() interface{} {
+		return new(dateObject)
+	},
+}
+
+func (o *dateObject) Recycle() {
+	o.msec = 0
+	o.values = nil
+	o.invalid = false
+	// todo recycle base object?
+	dateObjectPool.Put(o)
+}
+
+// Recycler todo temp
+type Recycler interface {
+	Recycle()
 }

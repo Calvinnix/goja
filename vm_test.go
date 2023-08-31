@@ -531,3 +531,26 @@ func TestStashMemUsage(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkDateLoop(b *testing.B) {
+	const SCRIPT = `
+	function f() {
+		for (var i = 0; i < 100; i++) {
+			const now = new Date(Date.now());
+			const year = now.getUTCFullYear();
+			const month = ("0" + (now.getUTCMonth() + 1)).slice(-2);
+			const day = ("0" + now.getUTCDate()).slice(-2);
+			const hour = ("0" + now.getUTCHours()).slice(-2);
+		}
+	}
+	f()
+	`
+	b.StopTimer()
+	vm := New()
+	prg := MustCompile("test.js", SCRIPT, false)
+	// prg.dumpCode(log.Printf)
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		vm.RunProgram(prg)
+	}
+}

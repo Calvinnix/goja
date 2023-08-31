@@ -1579,6 +1579,14 @@ func (r *Runtime) RunProgram(p *Program) (result Value, err error) {
 		vm.halt = false
 		vm.clearStack()
 	} else {
+		for _, value := range vm.stack {
+			o := value.baseObject(r)
+			if o != nil {
+				if v, ok := o.self.(Recycler); ok {
+					v.Recycle()
+				}
+			}
+		}
 		vm.stack = nil
 		vm.prg = nil
 		vm.setFuncName("")
