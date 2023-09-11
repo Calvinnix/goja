@@ -709,7 +709,7 @@ func (r *Runtime) stringproto_replaceAll(call FunctionCall) Value {
 	s := call.This.toString()
 	var found [][]int
 	searchStr := searchValue.toString()
-	searchLength := searchStr.Length()
+	searchLength := searchStr.length()
 	advanceBy := toIntStrict(max(1, int64(searchLength)))
 
 	pos := s.index(searchStr, 0)
@@ -719,7 +719,7 @@ func (r *Runtime) stringproto_replaceAll(call FunctionCall) Value {
 	}
 
 	str, rcall := getReplaceValue(replaceValue)
-	return stringReplace(s, found, str, rcall)
+	return stringReplace(call.ctx, s, found, str, rcall)
 }
 
 func (r *Runtime) stringproto_search(call FunctionCall) Value {
