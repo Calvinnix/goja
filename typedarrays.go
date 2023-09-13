@@ -113,7 +113,7 @@ func (a ArrayBuffer) MemUsage(ctx *MemUsageContext) (memUsage uint64, newMemUsag
 }
 
 func (r *Runtime) NewArrayBuffer(data []byte) ArrayBuffer {
-	buf := r._newArrayBuffer(r.global.ArrayBufferPrototype, nil)
+	buf := r._newArrayBuffer(r.getArrayBufferPrototype(), nil)
 	buf.data = data
 	return ArrayBuffer{
 		buf: buf,
@@ -123,9 +123,9 @@ func (r *Runtime) NewArrayBuffer(data []byte) ArrayBuffer {
 // DIVERSION: NewUint8Array converts a byte slice to a Uint8Array
 // javascript object in order to bypass a Buffer.from call in js-land
 func (r *Runtime) NewUint8Array(data []byte) *Object {
-	buf := r._newArrayBuffer(r.global.ArrayBufferPrototype, nil)
+	buf := r._newArrayBuffer(r.getArrayBufferPrototype(), nil)
 	buf.data = data
-	a := r.newUint8ArrayObject(buf, 0, len(buf.data), r.global.Uint8Array)
+	a := r.newUint8ArrayObject(buf, 0, len(buf.data), r.getUint8Array())
 	return a.val
 }
 
@@ -759,45 +759,45 @@ func (r *Runtime) _newTypedArrayObject(buf *arrayBufferObject, offset, length, e
 }
 
 func (r *Runtime) newUint8ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 1, r.global.Uint8Array, (*uint8Array)(&buf.data), proto)
+	return r._newTypedArrayObject(buf, offset, length, 1, r.getUint8Array(), (*uint8Array)(&buf.data), proto)
 }
 
 func (r *Runtime) newUint8ClampedArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 1, r.global.Uint8ClampedArray, (*uint8ClampedArray)(&buf.data), proto)
+	return r._newTypedArrayObject(buf, offset, length, 1, r.getUint8ClampedArray(), (*uint8ClampedArray)(&buf.data), proto)
 }
 
 func (r *Runtime) newInt8ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 1, r.global.Int8Array, (*int8Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 1, r.getInt8Array(), (*int8Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newUint16ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 2, r.global.Uint16Array, (*uint16Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 2, r.getUint16Array(), (*uint16Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newInt16ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 2, r.global.Int16Array, (*int16Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 2, r.getInt16Array(), (*int16Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newUint32ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 4, r.global.Uint32Array, (*uint32Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 4, r.getUint32Array(), (*uint32Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newInt32ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 4, r.global.Int32Array, (*int32Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 4, r.getInt32Array(), (*int32Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newFloat32ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 4, r.global.Float32Array, (*float32Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 4, r.getFloat32Array(), (*float32Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (r *Runtime) newFloat64ArrayObject(buf *arrayBufferObject, offset, length int, proto *Object) *typedArrayObject {
-	return r._newTypedArrayObject(buf, offset, length, 8, r.global.Float64Array, (*float64Array)(unsafe.Pointer(&buf.data)), proto)
+	return r._newTypedArrayObject(buf, offset, length, 8, r.getFloat64Array(), (*float64Array)(unsafe.Pointer(&buf.data)), proto)
 }
 
 func (o *dataViewObject) getIdxAndByteOrder(getIdx int, littleEndianVal Value, size int) (int, byteOrder) {
 	o.viewedArrayBuf.ensureNotDetached(true)
 	if getIdx+size > o.byteLen {
-		panic(o.val.runtime.newError(o.val.runtime.global.RangeError, "Index %d is out of bounds", getIdx))
+		panic(o.val.runtime.newError(o.val.runtime.getRangeError(), "Index %d is out of bounds", getIdx))
 	}
 	getIdx += o.byteOffset
 	var bo byteOrder

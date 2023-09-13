@@ -19,6 +19,7 @@ func TestArrayDelete(t *testing.T) {
 	var deleted = delete a[0];
 	var undef = a[0] === undefined;
 	var len = a.length;
+
 	deleted && undef && len === 2;
 	`
 
@@ -321,4 +322,20 @@ func TestArrayFlatMap(t *testing.T) {
 	assert(deepEqual(array.flatMap(double), [2,2,3,[4,5,6],[[[7,8,9]]]]), '#1');
 	`
 	testScriptWithTestLibX(SCRIPT, _undefined, t)
+}
+
+func TestArrayProto(t *testing.T) {
+	const SCRIPT = `
+	const a = Array.prototype;
+	a.push(1, 2, 3, 4, 5);
+	assert.sameValue(a.length, 5);
+	assert.sameValue(a[0], 1);
+	a.length = 3;
+	assert.sameValue(a.length, 3);
+	assert(compareArray(a, [1, 2, 3]));
+	a.shift();
+	assert.sameValue(a.length, 2);
+	assert(compareArray(a, [2, 3]));
+	`
+	testScriptWithTestLib(SCRIPT, _undefined, t)
 }

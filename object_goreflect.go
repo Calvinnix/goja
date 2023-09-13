@@ -122,24 +122,24 @@ func (o *objectGoReflect) init() {
 	switch o.fieldsValue.Kind() {
 	case reflect.Bool:
 		o.class = classBoolean
-		o.prototype = o.val.runtime.global.BooleanPrototype
+		o.prototype = o.val.runtime.getBooleanPrototype()
 		o.toString = o._toStringBool
 		o.valueOf = o._valueOfBool
 	case reflect.String:
 		o.class = classString
-		o.prototype = o.val.runtime.global.StringPrototype
+		o.prototype = o.val.runtime.getStringPrototype()
 		o.toString = o._toStringString
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		o.class = classNumber
-		o.prototype = o.val.runtime.global.NumberPrototype
+		o.prototype = o.val.runtime.getNumberPrototype()
 		o.valueOf = o._valueOfInt
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		o.class = classNumber
-		o.prototype = o.val.runtime.global.NumberPrototype
+		o.prototype = o.val.runtime.getNumberPrototype()
 		o.valueOf = o._valueOfUint
 	case reflect.Float32, reflect.Float64:
 		o.class = classNumber
-		o.prototype = o.val.runtime.global.NumberPrototype
+		o.prototype = o.val.runtime.getNumberPrototype()
 		o.valueOf = o._valueOfFloat
 	default:
 		o.class = classObject
@@ -182,8 +182,8 @@ func (o *objectGoReflect) init() {
 	}
 
 	if o.toString != nil || o.valueOf != nil {
-		o.baseObject._putProp("toString", o.val.runtime.newNativeFunc(o.toStringFunc, nil, "toString", nil, 0), true, false, true)
-		o.baseObject._putProp("valueOf", o.val.runtime.newNativeFunc(o.valueOfFunc, nil, "valueOf", nil, 0), true, false, true)
+		o.baseObject._putProp("toString", o.val.runtime.newNativeFunc(o.toStringFunc, "toString", 0), true, false, true)
+		o.baseObject._putProp("valueOf", o.val.runtime.newNativeFunc(o.valueOfFunc, "valueOf", 0), true, false, true)
 	}
 
 	if len(o.methodsInfo.Names) > 0 && o.fieldsValue.Kind() != reflect.Interface {

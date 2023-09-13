@@ -531,3 +531,30 @@ func TestStashMemUsage(t *testing.T) {
 		})
 	}
 }
+
+func TestLodashIsPlainObject(t *testing.T) {
+	const SCRIPT = `
+function wrap() {
+	var objectTag = '[object Object]';
+	function overArg(func, transform) {
+		return function(arg) {
+			return func(transform(arg));
+		};
+	}
+	var objectProto = Object.prototype;
+	var hasOwnProperty = objectProto.hasOwnProperty;
+	var getPrototype = overArg(Object.getPrototypeOf, Object);
+	function isPlainObject(value) {
+		var proto = getPrototype(value);
+		if (proto === null) {
+			return true;
+		}
+		var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+		return typeof Ctor == 'function'
+	}
+	return isPlainObject({ "foo": "bar" });
+}
+wrap()
+	`
+	testScript(SCRIPT, valueTrue, t)
+}

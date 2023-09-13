@@ -57,7 +57,7 @@ func (r *Runtime) createArrayIterator(iterObj *Object, kind iterationKind) Value
 	ai.val = o
 	ai.extensible = true
 	o.self = ai
-	ai.prototype = r.global.ArrayIteratorPrototype
+	ai.prototype = r.getArrayIteratorPrototype()
 	ai.init()
 
 	return o
@@ -510,7 +510,7 @@ func (a *arrayObject) exportType() reflect.Type {
 
 func (a *arrayObject) exportToArrayOrSlice(dst reflect.Value, typ reflect.Type, ctx *objectExportCtx) error {
 	r := a.val.runtime
-	if iter := a.getSym(SymIterator, nil); iter == r.global.arrayValues || iter == nil {
+	if iter := a.getSym(SymIterator, nil); iter == r.getArrayValues() || iter == nil {
 		l := toIntStrict(int64(a.length))
 		if typ.Kind() == reflect.Array {
 			if dst.Len() != l {
