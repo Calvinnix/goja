@@ -386,7 +386,6 @@ func hasInstance(val *Object, v Value) bool {
 				}
 			}
 		} else {
-			// todo upstream panics here, maybe we should too
 			val.runtime.typeErrorResult(true, "prototype is not an object")
 		}
 	}

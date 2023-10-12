@@ -124,7 +124,6 @@ func (r *Runtime) builtin_Error(args []Value, proto *Object) *Object {
 	if len(args) > 0 && args[0] != _undefined {
 		obj._putProp("message", args[0], true, false, true)
 	}
-	// todo might not be needed? It isn't in the upstream
 	obj._putProp("name", proto.Get("name"), true, true, true)
 	return obj.val
 }

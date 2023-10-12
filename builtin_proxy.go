@@ -240,7 +240,6 @@ func (h *nativeProxyHandler) toObject(runtime *Runtime) *Object {
 	return runtime.ToValue(h.handler).ToObject(runtime)
 }
 
-// todo what is happening here
 func (r *Runtime) newNativeProxyHandler(nativeHandler *ProxyTrapConfig) proxyHandler {
 	return &nativeProxyHandler{handler: nativeHandler}
 }
