@@ -333,6 +333,18 @@ func (a *arrayObject) hasOwnPropertyIdx(idx valueInt) bool {
 	return a.baseObject.hasOwnPropertyStr(idx.string())
 }
 
+func (a *arrayObject) hasPropertyIdx(idx valueInt) bool {
+	if a.hasOwnPropertyIdx(idx) {
+		return true
+	}
+
+	if a.prototype != nil {
+		return a.prototype.self.hasPropertyIdx(idx)
+	}
+
+	return false
+}
+
 func (a *arrayObject) expand(idx uint32) bool {
 	targetLen := idx + 1
 	if targetLen > uint32(len(a.values)) {
