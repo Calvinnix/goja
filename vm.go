@@ -3273,7 +3273,6 @@ func (vm *vm) callEval(n int, strict bool) {
 	if _, ok := vm.stack[vm.sp-n-1].(*Object); !ok {
 		panic(vm.r.NewTypeError("'eval' is not a function"))
 	}
-	// todo hmm should this use getEval?
 	if vm.r.toObject(vm.stack[vm.sp-n-1]) == vm.r.global.Eval {
 		if n > 0 {
 			srcVal := vm.stack[vm.sp-n]
@@ -3441,7 +3440,6 @@ func (numargs call) exec(vm *vm) {
 		vm.sp -= n + 1
 		vm.pc++
 	case *templatedFuncObject:
-		// todo fixes an issue
 		f.vmCall(vm, n)
 	default:
 		vm.r.typeErrorResult(true, "Not a function: %s", obj.toString())
@@ -4575,8 +4573,6 @@ func (_typeof) exec(vm *vm) {
 			break
 		}
 		switch s := v.self.(type) {
-		// todo making a guess that templatedFuncObject is needed here
-		// todo perhaps use the same v.self.typeOf() call that is used in upstream
 		case *classFuncObject, *methodFuncObject, *funcObject, *nativeFuncObject, *wrappedFuncObject, *boundFuncObject, *arrowFuncObject, *templatedFuncObject:
 			r = stringFunction
 		case *proxyObject:
