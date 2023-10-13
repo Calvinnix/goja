@@ -455,8 +455,8 @@ func TestMemCheck(t *testing.T) {
 			// With the new template-object feature, objects are now not initialized on vm start but instead initialized
 			// when actually being used. To account for this difference we create a New Error error so that this memory
 			// usage is already included in the initial checkMem call.
-            const err = new Error();
-            checkMem();
+			const err = new Error();
+			checkMem();
 			try {
 				throw new Error("abc");
 			} catch(e) {
