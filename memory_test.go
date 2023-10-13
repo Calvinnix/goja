@@ -451,7 +451,12 @@ func TestMemCheck(t *testing.T) {
 		// TODO(REALMC-10739) add a test that calls Error.captureStackTrace when it is implemented)
 		{
 			desc: "stash",
-			script: `checkMem();
+			script: `
+			// With the new template-object feature, objects are now not initialized on vm start but instead initialized
+			// when actually being used. To account for this difference we create a New Error error so that this memory
+			// usage is already included in the initial checkMem call.
+            const err = new Error();
+            checkMem();
 			try {
 				throw new Error("abc");
 			} catch(e) {
@@ -510,14 +515,13 @@ func TestMemCheck(t *testing.T) {
 				t.Fatalf("expected at least two entries in new mem check function, but got %d", len(memChecks))
 			}
 
-			// todo, lazy loading impacts the memory we are seeing commenting out for now
 			memDiff := memChecks[len(memChecks)-1] - memChecks[0]
 			if memDiff != tc.expectedSizeDiff {
-				//t.Fatalf("expected memory change to equal %d but got %d instead", tc.expectedSizeDiff, memDiff)
+				t.Fatalf("expected memory change to equal %d but got %d instead", tc.expectedSizeDiff, memDiff)
 			}
 			newMemDiff := newMemChecks[len(newMemChecks)-1] - newMemChecks[0]
 			if newMemDiff != tc.expectedNewSizeDiff {
-				//t.Fatalf("expected new memory change to equal %d but got %d instead", tc.expectedNewSizeDiff, newMemDiff)
+				t.Fatalf("expected new memory change to equal %d but got %d instead", tc.expectedNewSizeDiff, newMemDiff)
 			}
 		})
 	}
@@ -570,7 +574,7 @@ func TestMemMaxDepth(t *testing.T) {
 			}
 
 			_, _, err = vm.MemUsage(
-				// todo need to add 2 since Object is lazy loaded it will add onto the expected depth
+				// need to add 2 to the expectedDepth since Object is lazy loaded it adds onto the expected depth
 				NewMemUsageContext(vm, tc.expectedDepth+2, memUsageLimit, arrLenThreshold, objPropsLenThreshold, TestNativeMemUsageChecker{}),
 			)
 			if err != nil {

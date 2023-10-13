@@ -356,7 +356,6 @@ func (f *templatedFuncObject) typeOf() valueString {
 	return stringFunction
 }
 
-// todo what is this?
 func (f *templatedFuncObject) hasInstance(v Value) bool {
 	return hasInstance(f.val, v)
 }

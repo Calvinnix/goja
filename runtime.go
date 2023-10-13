@@ -1869,7 +1869,6 @@ func (r *Runtime) toValue(i interface{}, origValue reflect.Value) Value {
 		// all its methods. This is done deliberately instead of converting it to a `Date` because these two types are not fully
 		// compatible: `time.Time` includes zone, whereas JS `Date` doesn't. Doing the conversion implicitly therefore would
 		// result in a loss of information.
-		// todo guessing that I need to use the template object instead
 		return r.newDateObject(i, true, r.getDatePrototype())
 	case uint:
 		if uint64(i) <= math.MaxInt64 {
