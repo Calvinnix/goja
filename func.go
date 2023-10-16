@@ -419,7 +419,6 @@ func (f *nativeFuncObject) assertCallable() (func(FunctionCall) Value, bool) {
 	return nil, false
 }
 
-// todo Might can remove this as a duplicate
 func (f *nativeFuncObject) Call(call FunctionCall) Value {
 	vm := f.val.runtime.vm
 	prevFuncName := vm.getFuncName()

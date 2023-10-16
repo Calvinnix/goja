@@ -7,67 +7,55 @@ import (
 	"github.com/dop251/goja/ftoa"
 )
 
-func (r *Runtime) numberproto_valueOf(call FunctionCall) Value {
-	this := call.This
-	if !isNumber(this) {
-		r.typeErrorResult(true, "Value is not a number")
-	}
-	if x, ok := this.assertInt64(); ok {
-		return valueNumber{
-			val:   x,
-			_type: reflectTypeInt64,
-		}
-	}
-	if x, ok := this.assertInt32(); ok {
-		return valueNumber{
-			val:   x,
-			_type: reflectTypeInt32,
-		}
-	}
-	if x, ok := this.assertUInt32(); ok {
-		return valueNumber{
-			val:   x,
-			_type: reflectTypeUInt32,
-		}
-	}
-	if x, ok := this.assertInt(); ok {
-		return valueNumber{
-			val:   x,
-			_type: reflectTypeInt,
-		}
-	}
-	switch t := this.(type) {
-	case valueInt, valueFloat, valueInt64:
-		return this
-	case *Object:
-		if v, ok := t.self.(*primitiveValueObject); ok {
-			return v.pValue
-		}
-	}
-
-	panic(r.NewTypeError("Number.prototype.valueOf is not generic"))
-}
-
-func IsNumber(v Value) bool {
-	return isNumber(v)
-}
-
-func isNumber(v Value) bool {
+func (r *Runtime) toNumber(v Value) Value {
 	switch t := v.(type) {
-	case valueFloat, valueInt, valueInt32, valueInt64, valueUInt32, valueNumber:
-		return true
+	case valueFloat, valueInt, valueInt64:
+		return v
 	case *Object:
 		switch t := t.self.(type) {
 		case *primitiveValueObject:
-			return isNumber(t.pValue)
+			return r.toNumber(t.pValue)
+		case *objectGoReflect:
+			if t.class == classNumber && t.valueOf != nil {
+				return t.valueOf()
+			}
+		}
+		if t == r.global.NumberPrototype {
+			return _positiveZero
 		}
 	}
-	return false
+	panic(r.NewTypeError("Value is not a number: %s", v))
+}
+
+func (r *Runtime) numberproto_valueOf(call FunctionCall) Value {
+	return r.toNumber(call.This)
 }
 
 func (r *Runtime) numberproto_toString(call FunctionCall) Value {
-	if !isNumber(call.This) {
-		r.typeErrorResult(true, "Value is not a number")
+	var numVal Value
+	switch t := call.This.(type) {
+	case valueFloat, valueInt, valueInt64:
+		numVal = t
+	case *Object:
+		switch t := t.self.(type) {
+		case *primitiveValueObject:
+			numVal = r.toNumber(t.pValue)
+		case *objectGoReflect:
+			if t.class == classNumber {
+				if t.toString != nil {
+					return t.toString()
+				}
+				if t.valueOf != nil {
+					numVal = t.valueOf()
+				}
+			}
+		}
+		if t == r.global.NumberPrototype {
+			return asciiString("0")
+		}
+	}
+	if numVal == nil {
+		panic(r.NewTypeError("Value is not a number"))
 	}
 	var radix int
 	if arg := call.Argument(0); arg != _undefined {
@@ -80,7 +68,7 @@ func (r *Runtime) numberproto_toString(call FunctionCall) Value {
 		panic(r.newError(r.getRangeError(), "toString() radix argument must be between 2 and 36"))
 	}
 
-	num := call.This.ToFloat()
+	num := numVal.ToFloat()
 
 	if math.IsNaN(num) {
 		return stringNaN
