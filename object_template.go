@@ -337,7 +337,6 @@ func (f *templatedFuncObject) assertCallable() (func(FunctionCall) Value, bool) 
 	return nil, false
 }
 
-// todo this is probably how we need to bridge the gap between new and old
 func (f *templatedFuncObject) vmCall(vm *vm, n int) {
 	var nf nativeFuncObject
 	nf.f = f.f

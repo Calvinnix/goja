@@ -1440,7 +1440,9 @@ func (r *Runtime) createArrayBufferProto(val *Object) objectImpl {
 	byteLengthProp := &valueProperty{
 		accessor:     true,
 		configurable: true,
+		writable:     true,
 		getterFunc:   r.newNativeFunc(r.arrayBufferProto_getByteLength, "get byteLength", 0),
+		setterFunc:   r.newNativeFunc(r.arrayBufferProto_setByteLength, "set byteLength", 0),
 	}
 	b._put("byteLength", byteLengthProp)
 	b._putProp("constructor", r.getArrayBuffer(), true, false, true)
@@ -1726,7 +1728,9 @@ func createDataViewProtoTemplate() *objectTemplate {
 		return &valueProperty{
 			accessor:     true,
 			configurable: true,
+			writable:     true,
 			getterFunc:   r.newNativeFunc(r.dataViewProto_getByteLen, "get byteLength", 0),
+			setterFunc:   r.newNativeFunc(r.dataViewProto_getByteLen, "set byteLength", 0),
 		}
 	})
 	t.putStr("byteOffset", func(r *Runtime) Value {

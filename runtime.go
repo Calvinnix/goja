@@ -63,9 +63,10 @@ type global struct {
 	Symbol   *Object
 	Proxy    *Object
 	Reflect  *Object
-	Promise  *Object
-	Math     *Object
-	JSON     *Object
+	// DIVERSION: we are not supporting Goja Promises
+	// Promise  *Object
+	Math *Object
+	JSON *Object
 
 	ArrayBuffer       *Object
 	DataView          *Object
@@ -134,8 +135,7 @@ type global struct {
 
 	Eval *Object
 
-	thrower         *Object
-	throwerProperty Value
+	thrower *Object
 
 	stdRegexpProto *guardedObject
 
@@ -822,7 +822,6 @@ func (r *Runtime) newNativeFuncConstructObj(v *Object, construct func(args []Val
 	return f
 }
 
-// todo our added native.go logic may need some additional eyes to optimize, just making it work for now
 func (r *Runtime) newNativeFuncConstruct(v *Object, construct func(args []Value, proto *Object) *Object, name unistring.String, prototype *Object, length int64) *Object {
 	return r.newNativeFuncConstructProto(v, construct, name, prototype, r.getFunctionPrototype(), length)
 }
