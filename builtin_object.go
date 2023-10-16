@@ -478,6 +478,11 @@ func (r *Runtime) objectproto_toString(call FunctionCall) Value {
 		if obj == nil {
 			return newStringValue("[object Object]")
 		}
+		if o, ok := obj.self.(*objectGoReflect); ok {
+			if toString := o.toString; toString != nil {
+				return toString()
+			}
+		}
 		var clsName string
 		if isArray(obj) {
 			clsName = classArray

@@ -158,7 +158,7 @@ func (i valueNumber) Equals(other Value) bool {
 		return i.ToInt() == o.ToInt()
 	}
 	if o, ok := other.(*Object); ok {
-		return i.Equals(o.self.toPrimitiveNumber())
+		return i.Equals(o.toPrimitiveNumber())
 	}
 	return false
 }
@@ -284,7 +284,7 @@ func (i valueUInt32) Equals(other Value) bool {
 		return int(i) == o.ToInt()
 	}
 	if o, ok := other.(*Object); ok {
-		return i.Equals(o.self.toPrimitiveNumber())
+		return i.Equals(o.toPrimitiveNumber())
 	}
 	return false
 }
@@ -417,7 +417,7 @@ func (i valueInt32) Equals(other Value) bool {
 		return int(i) == o.ToInt()
 	}
 	if o, ok := other.(*Object); ok {
-		return i.Equals(o.self.toPrimitiveNumber())
+		return i.Equals(o.toPrimitiveNumber())
 	}
 	return false
 }
@@ -544,7 +544,7 @@ func (i valueInt64) Equals(other Value) bool {
 		return int(i) == o.ToInt()
 	}
 	if o, ok := other.(*Object); ok {
-		return i.Equals(o.self.toPrimitiveNumber())
+		return i.Equals(o.toPrimitiveNumber())
 	}
 	return false
 }
