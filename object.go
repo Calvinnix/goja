@@ -925,7 +925,7 @@ func (o *Object) ordinaryToPrimitiveNumber() Value {
 		return v
 	}
 
-	panic(o.runtime.NewTypeError("Could not convert %v (%T) to primitive", o.self, o.self))
+	panic(o.runtime.NewTypeError("Could not convert %v to primitive", o.self))
 }
 
 func (o *Object) ordinaryToPrimitiveString() Value {
