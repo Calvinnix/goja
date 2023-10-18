@@ -929,6 +929,10 @@ func (o *Object) ordinaryToPrimitiveNumber() Value {
 }
 
 func (o *Object) ordinaryToPrimitiveString() Value {
+	if o.Prototype() == nil {
+		o.self.setProto(o.runtime.global.ObjectPrototype, false)
+	}
+
 	if v := o.tryPrimitive("toString"); v != nil {
 		return v
 	}
