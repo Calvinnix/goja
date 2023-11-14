@@ -327,8 +327,8 @@ func (vm *vm) setFuncName(s unistring.String) {
 
 func intToValue(i int64) Value {
 	if i >= -maxInt && i <= maxInt {
-		if i >= -128 && i <= 127 {
-			return intCache[i+128]
+		if i >= -8192 && i <= 8191 {
+			return intCache[i+8192]
 		}
 		return valueInt(i)
 	}
@@ -336,8 +336,8 @@ func intToValue(i int64) Value {
 }
 
 func int64ToValue(i int64) Value {
-	if i >= -128 && i <= 127 {
-		return int64Cache[i+128]
+	if i >= -8192 && i <= 8191 {
+		return int64Cache[i+8192]
 	}
 	return valueInt64(i)
 }
