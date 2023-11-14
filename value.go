@@ -57,8 +57,10 @@ var (
 	reflectTypeError  = reflect.TypeOf((*error)(nil)).Elem()
 )
 
-var intCache [16384]Value
-var int64Cache [16384]Value
+const intCacheSize = 16384
+
+var intCache [intCacheSize]Value
+var int64Cache [256]Value
 
 func FalseValue() Value {
 	return valueFalse
@@ -1710,11 +1712,11 @@ func typeErrorResult(throw bool, args ...interface{}) {
 }
 
 func init() {
-	for i := 0; i < 16384; i++ {
-		intCache[i] = valueInt(i - 8192)
+	for i := 0; i < intCacheSize; i++ {
+		intCache[i] = valueInt(i - 128)
 	}
-	for i := 0; i < 16384; i++ {
-		int64Cache[i] = valueInt64(i - 8192)
+	for i := 0; i < 256; i++ {
+		int64Cache[i] = valueInt64(i - 128)
 	}
 	_positiveZero = intToValue(0)
 }
