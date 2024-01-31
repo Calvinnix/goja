@@ -71,6 +71,8 @@ type Program struct {
 	funcName unistring.String
 	src      *file.File
 	srcMap   []srcMapItem
+
+	metricName string
 }
 
 type compiler struct {

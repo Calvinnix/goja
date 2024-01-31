@@ -204,10 +204,17 @@ type Runtime struct {
 	limiter          *rate.Limiter
 	limiterTicksLeft int
 	ticks            uint64
+
+	disableTickMetrics bool
+	tickMetrics        map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
+}
+
+func (self *Runtime) GetTickMetrics() map[string]uint64 {
+	return self.tickMetrics
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that
@@ -3228,4 +3235,12 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 		return obj
 	}
 	return defProto
+}
+
+func (self *Runtime) DisableFunctionTickTracking() {
+	self.disableTickMetrics = true
+}
+
+func (self *Runtime) EnableFunctionTickTracking() {
+	self.disableTickMetrics = false
 }
