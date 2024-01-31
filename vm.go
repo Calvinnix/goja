@@ -582,26 +582,6 @@ func (vm *vm) init() {
 	vm.maxCallStackSize = math.MaxInt32
 }
 
-func (vm *vm) trackMetrics(prg *Program) {
-	if prg == nil {
-		return
-	}
-
-	if vm.r.functionTickMetrics == nil {
-		vm.r.functionTickMetrics = make(map[string]uint64)
-	}
-
-	// todo this might help out performance
-	if prg.metricName == "" {
-		prg.metricName = string(prg.funcName)
-		if prg.src != nil {
-			prg.metricName = prg.src.Name() + "_" + prg.metricName
-		}
-	}
-
-	vm.r.functionTickMetrics[prg.metricName]++
-}
-
 func (vm *vm) run() {
 	vm.halt = false
 	interrupted := false
@@ -670,8 +650,21 @@ func (vm *vm) run() {
 				atomic.StoreUint32(&vm.interrupted, 0)
 			}()
 		} else {
-			if tickMetricsEnabled {
-				vm.trackMetrics(vm.prg)
+			if tickMetricsEnabled && vm.r.ticks%10 == 0 {
+				if vm.prg != nil {
+					if vm.r.functionTickMetrics == nil {
+						vm.r.functionTickMetrics = make(map[string]uint64)
+					}
+
+					if vm.prg.metricName == "" {
+						vm.prg.metricName = string(vm.prg.funcName)
+						if vm.prg.src != nil {
+							vm.prg.metricName = vm.prg.src.Name() + "_" + vm.prg.metricName
+						}
+					}
+
+					vm.r.functionTickMetrics[vm.prg.metricName]++
+				}
 			}
 			vm.prg.code[vm.pc].exec(vm)
 		}
