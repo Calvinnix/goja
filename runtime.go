@@ -3240,7 +3240,3 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 func (self *Runtime) DisableFunctionTickTracking() {
 	self.disableTickMetrics = true
 }
-
-func (self *Runtime) EnableFunctionTickTracking() {
-	self.disableTickMetrics = false
-}
