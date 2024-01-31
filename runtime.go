@@ -205,16 +205,16 @@ type Runtime struct {
 	limiterTicksLeft int
 	ticks            uint64
 
-	disableTickMetrics bool
-	tickMetrics        map[string]uint64
+	disableTickMetrics  bool
+	functionTickMetrics map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
-func (self *Runtime) GetTickMetrics() map[string]uint64 {
-	return self.tickMetrics
+func (self *Runtime) GetFunctionTickMetrics() map[string]uint64 {
+	return self.functionTickMetrics
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that

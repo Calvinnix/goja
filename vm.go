@@ -587,8 +587,8 @@ func (vm *vm) trackMetrics(prg *Program) {
 		return
 	}
 
-	if vm.r.tickMetrics == nil {
-		vm.r.tickMetrics = make(map[string]uint64)
+	if vm.r.functionTickMetrics == nil {
+		vm.r.functionTickMetrics = make(map[string]uint64)
 	}
 
 	// todo this might help out performance
@@ -599,7 +599,7 @@ func (vm *vm) trackMetrics(prg *Program) {
 		}
 	}
 
-	vm.r.tickMetrics[prg.metricName]++
+	vm.r.functionTickMetrics[prg.metricName]++
 }
 
 func (vm *vm) run() {
