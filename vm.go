@@ -321,16 +321,8 @@ func (vm *vm) setPrg(prg *Program) {
 			if vm.r.functionTickMetrics == nil {
 				vm.r.functionTickMetrics = make(map[string]uint64)
 			}
-
-			// todo this optimization might not be needed
-			if vm.prg.metricName == "" {
-				vm.prg.metricName = string(vm.prg.funcName)
-				if vm.prg.src != nil {
-					vm.prg.metricName = vm.prg.src.Name() + "_" + vm.prg.metricName
-				}
-			}
-
-			vm.r.functionTickMetrics[vm.prg.metricName] += currentTicks - vm.lastFunctionTicks
+			functionName := vm.prg.src.Name() + "_" + string(vm.prg.funcName)
+			vm.r.functionTickMetrics[functionName] += currentTicks - vm.lastFunctionTicks
 		}
 		vm.lastFunctionTicks = currentTicks
 	}
