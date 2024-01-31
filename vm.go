@@ -306,10 +306,35 @@ type vm struct {
 	interrupted   uint32
 	interruptVal  interface{}
 	interruptLock sync.Mutex
+
+	lastFunctionTicks uint64
 }
 
 type instruction interface {
 	exec(*vm)
+}
+
+func (vm *vm) setPrg(prg *Program) {
+	if !vm.r.disableTickMetrics {
+		currentTicks := vm.r.Ticks()
+		if vm.prg != nil {
+			if vm.r.functionTickMetrics == nil {
+				vm.r.functionTickMetrics = make(map[string]uint64)
+			}
+
+			// todo this optimization might not be needed
+			if vm.prg.metricName == "" {
+				vm.prg.metricName = string(vm.prg.funcName)
+				if vm.prg.src != nil {
+					vm.prg.metricName = vm.prg.src.Name() + "_" + vm.prg.metricName
+				}
+			}
+
+			vm.r.functionTickMetrics[vm.prg.metricName] += currentTicks - vm.lastFunctionTicks
+		}
+		vm.lastFunctionTicks = currentTicks
+	}
+	vm.prg = prg
 }
 
 func (vm *vm) getFuncName() unistring.String {
@@ -585,7 +610,6 @@ func (vm *vm) init() {
 func (vm *vm) run() {
 	vm.halt = false
 	interrupted := false
-	tickMetricsEnabled := !vm.r.disableTickMetrics
 
 	for !vm.halt {
 		// NOTE: we should try to avoid making expensive operations within this
@@ -650,22 +674,6 @@ func (vm *vm) run() {
 				atomic.StoreUint32(&vm.interrupted, 0)
 			}()
 		} else {
-			if tickMetricsEnabled && vm.r.ticks%10 == 0 {
-				if vm.prg != nil {
-					if vm.r.functionTickMetrics == nil {
-						vm.r.functionTickMetrics = make(map[string]uint64)
-					}
-
-					if vm.prg.metricName == "" {
-						vm.prg.metricName = string(vm.prg.funcName)
-						if vm.prg.src != nil {
-							vm.prg.metricName = vm.prg.src.Name() + "_" + vm.prg.metricName
-						}
-					}
-
-					vm.r.functionTickMetrics[vm.prg.metricName]++
-				}
-			}
 			vm.prg.code[vm.pc].exec(vm)
 		}
 	}
@@ -884,8 +892,9 @@ func (vm *vm) pushCtx() {
 }
 
 func (vm *vm) restoreCtx(ctx *vmContext) {
-	vm.prg, vm.stash, vm.privEnv, vm.newTarget, vm.result, vm.pc, vm.sb, vm.args =
-		ctx.prg, ctx.stash, ctx.privEnv, ctx.newTarget, ctx.result, ctx.pc, ctx.sb, ctx.args
+	vm.stash, vm.privEnv, vm.newTarget, vm.result, vm.pc, vm.sb, vm.args =
+		ctx.stash, ctx.privEnv, ctx.newTarget, ctx.result, ctx.pc, ctx.sb, ctx.args
+	vm.setPrg(ctx.prg)
 
 	vm.ctx = ctx.ctx
 	vm.setFuncName(ctx.funcName)
@@ -3412,7 +3421,7 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.prg = f.prg
+		vm.setPrg(f.prg)
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3422,7 +3431,7 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.prg = f.prg
+		vm.setPrg(f.prg)
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3432,7 +3441,7 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.prg = f.prg
+		vm.setPrg(f.prg)
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3447,7 +3456,7 @@ func (numargs call) exec(vm *vm) {
 		vm._nativeCall(&f.nativeFuncObject, n)
 	case *proxyObject:
 		vm.pushCtx()
-		vm.prg = nil
+		vm.setPrg(nil)
 		vm.setFuncName("proxy")
 		ret := f.apply(FunctionCall{ctx: vm.ctx, This: vm.stack[vm.sp-n-2], Arguments: vm.stack[vm.sp-n : vm.sp]})
 		if ret == nil {
@@ -3467,7 +3476,7 @@ func (numargs call) exec(vm *vm) {
 func (vm *vm) _nativeCall(f *nativeFuncObject, n int) {
 	if f.f != nil {
 		vm.pushCtx()
-		vm.prg = nil
+		vm.setPrg(nil)
 		vm.setFuncName(nilSafe(f.getStr("name", nil)).string())
 		ret := f.f(FunctionCall{
 			ctx:       vm.ctx,
