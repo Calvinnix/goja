@@ -205,8 +205,8 @@ type Runtime struct {
 	limiterTicksLeft int
 	ticks            uint64
 
-	disableTickMetrics  bool
-	functionTickMetrics map[string]uint64
+	functionTickTrackingDisabled bool
+	functionTickMetrics          map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
@@ -3238,5 +3238,5 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 }
 
 func (self *Runtime) DisableFunctionTickTracking() {
-	self.disableTickMetrics = true
+	self.functionTickTrackingDisabled = true
 }
