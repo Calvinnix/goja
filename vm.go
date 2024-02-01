@@ -315,7 +315,7 @@ type instruction interface {
 }
 
 func (vm *vm) setPrg(prg *Program) {
-	if !vm.r.functionTickTrackingDisabled {
+	if vm.r.functionTickTrackingEnabled {
 		currentTicks := vm.r.Ticks()
 		if vm.prg != nil {
 			if vm.r.functionTickMetrics == nil {

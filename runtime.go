@@ -205,14 +205,15 @@ type Runtime struct {
 	limiterTicksLeft int
 	ticks            uint64
 
-	functionTickTrackingDisabled bool
-	functionTickMetrics          map[string]uint64
+	functionTickTrackingEnabled bool
+	functionTickMetrics         map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
+// GetFunctionTickMetrics returns a map of ticks used per function. This function is not thread-safe.
 func (self *Runtime) GetFunctionTickMetrics() map[string]uint64 {
 	return self.functionTickMetrics
 }
@@ -3237,6 +3238,10 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 	return defProto
 }
 
+func (self *Runtime) EnableFunctionTickTracking() {
+	self.functionTickTrackingEnabled = true
+}
+
 func (self *Runtime) DisableFunctionTickTracking() {
-	self.functionTickTrackingDisabled = true
+	self.functionTickTrackingEnabled = false
 }
