@@ -213,7 +213,8 @@ func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
-// GetFunctionTickMetrics returns a map of ticks used per function. This function is not thread-safe.
+// GetFunctionTickMetrics returns a map of ticks used per function.
+// This function is not thread-safe and should only be called at the end of the function execution.
 func (self *Runtime) GetFunctionTickMetrics() map[string]uint64 {
 	return self.functionTickMetrics
 }
