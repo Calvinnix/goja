@@ -321,8 +321,11 @@ func (vm *vm) setPrg(prg *Program) {
 			if vm.r.functionTickMetrics == nil {
 				vm.r.functionTickMetrics = make(map[string]uint64)
 			}
-			functionName := vm.prg.src.Name() + "_" + string(vm.prg.funcName)
-			vm.r.functionTickMetrics[functionName] += currentTicks - vm.lastFunctionTicks
+			function := string(vm.prg.funcName)
+			if vm.prg.src != nil {
+				function = vm.prg.src.Name() + "_" + function
+			}
+			vm.r.functionTickMetrics[function] += currentTicks - vm.lastFunctionTicks
 		}
 		vm.lastFunctionTicks = currentTicks
 	}
