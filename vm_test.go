@@ -2,6 +2,7 @@ package goja
 
 import (
 	"math"
+	"reflect"
 	"testing"
 
 	"github.com/dop251/goja/parser"
@@ -666,25 +667,9 @@ func TestTickTracking(t *testing.T) {
 			}
 
 			actualTickMetrics := vm.TickMetrics()
-			if !isEqual(actualTickMetrics, tc.expectedTickMetrics) {
+			if !reflect.DeepEqual(actualTickMetrics, tc.expectedTickMetrics) {
 				t.Fatalf("Unexpected tickMetrics. Actual: %v Expected: %v", actualTickMetrics, tc.expectedTickMetrics)
 			}
 		})
 	}
-}
-
-func isEqual(map1, map2 map[string]uint64) bool {
-	if map1 == nil && map2 == nil {
-		return true
-	}
-	if len(map1) != len(map2) {
-		return false
-	}
-	for key, valueMap1 := range map1 {
-		valueMap2, ok := map2[key]
-		if !ok || valueMap1 != valueMap2 {
-			return false
-		}
-	}
-	return true
 }
