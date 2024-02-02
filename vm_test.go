@@ -594,3 +594,97 @@ func TestStashMemUsage(t *testing.T) {
 		})
 	}
 }
+
+func TestTickTracking(t *testing.T) {
+	tests := []struct {
+		name                        string
+		script                      string
+		functionTickTrackingEnabled bool
+		expectedTickMetrics         map[string]uint64
+	}{
+		{
+			name: "should track looping function ticks when tick tracking is enabled",
+			script: `
+				function f() {
+					for (var i = 0; i < 100; i++) {
+					}
+				}
+				f()
+			`,
+			functionTickTrackingEnabled: true,
+			expectedTickMetrics:         map[string]uint64{"test.js_": 6, "test.js_f": 809},
+		},
+		{
+			name: "should track larger looping function ticks when tick tracking is enabled",
+			script: `
+				function f() {
+					for (var i = 0; i < 1000; i++) {
+					}
+				}
+				f()
+			`,
+			functionTickTrackingEnabled: true,
+			expectedTickMetrics:         map[string]uint64{"test.js_": 6, "test.js_f": 8009},
+		},
+		{
+			name: "should track fib function ticks when tick tracking is enabled",
+			script: `
+				function fib(n) {
+					if (n < 2) return n;
+					return fib(n - 2) + fib(n - 1);
+				}
+				fib(35);
+			`,
+			functionTickTrackingEnabled: true,
+			expectedTickMetrics:         map[string]uint64{"test.js_": 7, "test.js_fib": 358328431},
+		},
+		{
+			name: "should not track function ticks when tick tracking is disabled",
+			script: `
+				function f() {
+					for (var i = 0; i < 100; i++) {
+					}
+				}
+				f()
+			`,
+			functionTickTrackingEnabled: false,
+			expectedTickMetrics:         map[string]uint64{},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			vm := New()
+			if tc.functionTickTrackingEnabled {
+				vm.EnableFunctionTickTracking()
+			}
+
+			prg := MustCompile("test.js", tc.script, false)
+			_, err := vm.RunProgram(prg)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			actualTickMetrics := vm.TickMetrics()
+			if !isEqual(actualTickMetrics, tc.expectedTickMetrics) {
+				t.Fatalf("Unexpected tickMetrics. Actual: %v Expected: %v", actualTickMetrics, tc.expectedTickMetrics)
+			}
+		})
+	}
+}
+
+func isEqual(map1, map2 map[string]uint64) bool {
+	if map1 == nil && map2 == nil {
+		return true
+	}
+	if len(map1) != len(map2) {
+		return false
+	}
+	for key, valueMap1 := range map1 {
+		valueMap2, ok := map2[key]
+		if !ok || valueMap1 != valueMap2 {
+			return false
+		}
+	}
+	return true
+}

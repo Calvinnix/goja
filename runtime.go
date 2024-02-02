@@ -498,9 +498,7 @@ func (r *Runtime) init() {
 	}
 	r.vm.init()
 
-	if r.functionTickTrackingEnabled {
-		r.tickMetrics = make(map[string]uint64)
-	}
+	r.tickMetrics = make(map[string]uint64)
 
 	r.SetRateLimiter(rate.NewLimiter(rate.Inf, maxInt))
 }
