@@ -227,7 +227,6 @@ func (f *classFuncObject) _initFields(instance *Object) {
 	if f.initFields != nil {
 		vm := f.val.runtime.vm
 		vm.pushCtx()
-		vm.profileTicks()
 		vm.prg = f.initFields
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
@@ -320,7 +319,6 @@ func (f *baseJsFuncObject) _call(ctx context.Context, args []Value, newTarget, t
 		vm.pushCtx()
 	}
 	vm.args = len(args)
-	vm.profileTicks()
 	vm.prg = f.prg
 	vm.stash = f.stash
 	vm.privEnv = f.privEnv
@@ -435,7 +433,6 @@ func (f *nativeFuncObject) Call(call FunctionCall) Value {
 func (f *nativeFuncObject) vmCall(vm *vm, n int) {
 	if f.f != nil {
 		vm.pushCtx()
-		vm.profileTicks()
 		vm.prg = nil
 		vm.sb = vm.sp - n // so that [sb-1] points to the callee
 		ret := f.f(FunctionCall{

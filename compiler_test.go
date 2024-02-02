@@ -156,7 +156,6 @@ func testLibX() *Program {
 
 func (r *Runtime) testPrg(p *Program, expectedResult Value, t *testing.T) {
 	vm := r.vm
-	vm.profileTicks()
 	vm.prg = p
 	vm.pc = 0
 	vm.prg.dumpCode(t.Logf)

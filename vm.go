@@ -314,19 +314,20 @@ type instruction interface {
 	exec(*vm)
 }
 
-// profileTicks tracks the ticks for the current Program, this should be called prior to updating the program (i.e. vm.prg = p)
+// profileTicks tracks the ticks for the current Program
 func (vm *vm) profileTicks() {
-	if vm.r.functionTickTrackingEnabled {
-		currentTicks := vm.r.Ticks()
-		if vm.prg != nil {
-			function := string(vm.prg.funcName)
-			if vm.prg.src != nil {
-				function = vm.prg.src.Name() + "_" + function
-			}
-			vm.r.tickMetrics[function] += currentTicks - vm.lastFunctionTicks
-		}
-		vm.lastFunctionTicks = currentTicks
+	if !vm.r.tickMetricTrackingEnabled {
+		return
 	}
+	currentTicks := vm.r.Ticks()
+	if vm.prg != nil {
+		function := string(vm.prg.funcName)
+		if vm.prg.src != nil {
+			function = vm.prg.src.Name() + "." + function
+		}
+		vm.r.tickMetrics[function] += currentTicks - vm.lastFunctionTicks
+	}
+	vm.lastFunctionTicks = currentTicks
 }
 
 func (vm *vm) getFuncName() unistring.String {
@@ -874,6 +875,7 @@ func (vm *vm) saveCtx(ctx *vmContext) {
 }
 
 func (vm *vm) pushCtx() {
+	vm.profileTicks()
 	if len(vm.callStack) > vm.maxCallStackSize {
 		panic(rangeError("Maximum call stack size exceeded"))
 	}
@@ -3412,7 +3414,6 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.profileTicks()
 		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
@@ -3423,7 +3424,6 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.profileTicks()
 		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
@@ -3434,7 +3434,6 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.profileTicks()
 		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
@@ -3450,7 +3449,6 @@ func (numargs call) exec(vm *vm) {
 		vm._nativeCall(&f.nativeFuncObject, n)
 	case *proxyObject:
 		vm.pushCtx()
-		vm.profileTicks()
 		vm.prg = nil
 		vm.setFuncName("proxy")
 		ret := f.apply(FunctionCall{ctx: vm.ctx, This: vm.stack[vm.sp-n-2], Arguments: vm.stack[vm.sp-n : vm.sp]})
@@ -3471,7 +3469,6 @@ func (numargs call) exec(vm *vm) {
 func (vm *vm) _nativeCall(f *nativeFuncObject, n int) {
 	if f.f != nil {
 		vm.pushCtx()
-		vm.profileTicks()
 		vm.prg = nil
 		vm.setFuncName(nilSafe(f.getStr("name", nil)).string())
 		ret := f.f(FunctionCall{

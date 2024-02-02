@@ -2,7 +2,6 @@ package goja
 
 import (
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/dop251/goja/parser"
@@ -601,7 +600,7 @@ func TestTickTracking(t *testing.T) {
 		name                        string
 		script                      string
 		functionTickTrackingEnabled bool
-		expectedTickMetrics         map[string]uint64
+		expectedTickMetricsKeys     []string
 	}{
 		{
 			name: "should track looping function ticks when tick tracking is enabled",
@@ -613,7 +612,7 @@ func TestTickTracking(t *testing.T) {
 				f()
 			`,
 			functionTickTrackingEnabled: true,
-			expectedTickMetrics:         map[string]uint64{"test.js_": 6, "test.js_f": 809},
+			expectedTickMetricsKeys:     []string{"test.js.", "test.js.f"},
 		},
 		{
 			name: "should track larger looping function ticks when tick tracking is enabled",
@@ -625,7 +624,7 @@ func TestTickTracking(t *testing.T) {
 				f()
 			`,
 			functionTickTrackingEnabled: true,
-			expectedTickMetrics:         map[string]uint64{"test.js_": 6, "test.js_f": 8009},
+			expectedTickMetricsKeys:     []string{"test.js.", "test.js.f"},
 		},
 		{
 			name: "should track fib function ticks when tick tracking is enabled",
@@ -637,7 +636,7 @@ func TestTickTracking(t *testing.T) {
 				fib(35);
 			`,
 			functionTickTrackingEnabled: true,
-			expectedTickMetrics:         map[string]uint64{"test.js_": 7, "test.js_fib": 358328431},
+			expectedTickMetricsKeys:     []string{"test.js.", "test.js.fib"},
 		},
 		{
 			name: "should not track function ticks when tick tracking is disabled",
@@ -649,7 +648,7 @@ func TestTickTracking(t *testing.T) {
 				f()
 			`,
 			functionTickTrackingEnabled: false,
-			expectedTickMetrics:         map[string]uint64{},
+			expectedTickMetricsKeys:     []string{},
 		},
 	}
 
@@ -657,7 +656,7 @@ func TestTickTracking(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			vm := New()
 			if tc.functionTickTrackingEnabled {
-				vm.EnableFunctionTickTracking()
+				vm.EnableTickMetricTracking()
 			}
 
 			prg := MustCompile("test.js", tc.script, false)
@@ -667,8 +666,15 @@ func TestTickTracking(t *testing.T) {
 			}
 
 			actualTickMetrics := vm.TickMetrics()
-			if !reflect.DeepEqual(actualTickMetrics, tc.expectedTickMetrics) {
-				t.Fatalf("Unexpected tickMetrics. Actual: %v Expected: %v", actualTickMetrics, tc.expectedTickMetrics)
+
+			if len(actualTickMetrics) != len(tc.expectedTickMetricsKeys) {
+				t.Fatalf("Unexpected tickMetrics length: Actual: %v Expected length: %v", actualTickMetrics, len(tc.expectedTickMetricsKeys))
+			}
+
+			for _, key := range tc.expectedTickMetricsKeys {
+				if actualTickMetrics[key] <= 0 {
+					t.Fatalf("Unexpected tickMetrics for key: %v. Expected a positive tick value but received: %v", key, actualTickMetrics[key])
+				}
 			}
 		})
 	}

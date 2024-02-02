@@ -205,18 +205,12 @@ type Runtime struct {
 	limiterTicksLeft int
 	ticks            uint64
 
-	functionTickTrackingEnabled bool
-	tickMetrics                 map[string]uint64
+	tickMetricTrackingEnabled bool
+	tickMetrics               map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
-}
-
-// TickMetrics returns a map of ticks used per function.
-// This function is not thread-safe and should only be called at the end of the function execution.
-func (self *Runtime) TickMetrics() map[string]uint64 {
-	return self.tickMetrics
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that
@@ -982,7 +976,6 @@ func (r *Runtime) common_eval(name, src string, direct, strict bool) Value {
 		panic(err)
 	}
 
-	vm.profileTicks()
 	vm.prg = p
 	vm.pc = 0
 	vm.args = 0
@@ -1525,7 +1518,6 @@ func (r *Runtime) RunProgram(p *Program) (result Value, err error) {
 		vm.stash = &r.global.stash
 		vm.sb = vm.sp - 1
 	}
-	vm.profileTicks()
 	vm.prg = p
 	vm.pc = 0
 	vm.result = _undefined
@@ -3244,10 +3236,16 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 	return defProto
 }
 
-func (self *Runtime) EnableFunctionTickTracking() {
-	self.functionTickTrackingEnabled = true
+func (self *Runtime) EnableTickMetricTracking() {
+	self.tickMetricTrackingEnabled = true
 }
 
-func (self *Runtime) DisableFunctionTickTracking() {
-	self.functionTickTrackingEnabled = false
+func (self *Runtime) DisableTickMetricTracking() {
+	self.tickMetricTrackingEnabled = false
+}
+
+// TickMetrics returns a map of ticks used per function.
+// This function is not thread-safe and should only be called at the end of the function execution.
+func (self *Runtime) TickMetrics() map[string]uint64 {
+	return self.tickMetrics
 }
