@@ -319,14 +319,11 @@ func (vm *vm) profileTicks() {
 	if vm.r.functionTickTrackingEnabled {
 		currentTicks := vm.r.Ticks()
 		if vm.prg != nil {
-			if vm.r.functionTickMetrics == nil {
-				vm.r.functionTickMetrics = make(map[string]uint64)
-			}
 			function := string(vm.prg.funcName)
 			if vm.prg.src != nil {
 				function = vm.prg.src.Name() + "_" + function
 			}
-			vm.r.functionTickMetrics[function] += currentTicks - vm.lastFunctionTicks
+			vm.r.tickMetrics[function] += currentTicks - vm.lastFunctionTicks
 		}
 		vm.lastFunctionTicks = currentTicks
 	}

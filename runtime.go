@@ -206,17 +206,17 @@ type Runtime struct {
 	ticks            uint64
 
 	functionTickTrackingEnabled bool
-	functionTickMetrics         map[string]uint64
+	tickMetrics                 map[string]uint64
 }
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
-// GetFunctionTickMetrics returns a map of ticks used per function.
+// TickMetrics returns a map of ticks used per function.
 // This function is not thread-safe and should only be called at the end of the function execution.
-func (self *Runtime) GetFunctionTickMetrics() map[string]uint64 {
-	return self.functionTickMetrics
+func (self *Runtime) TickMetrics() map[string]uint64 {
+	return self.tickMetrics
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that
@@ -497,6 +497,10 @@ func (r *Runtime) init() {
 		ctx: r.ctx,
 	}
 	r.vm.init()
+
+	if r.functionTickTrackingEnabled {
+		r.tickMetrics = make(map[string]uint64)
+	}
 
 	r.SetRateLimiter(rate.NewLimiter(rate.Inf, maxInt))
 }
