@@ -980,7 +980,8 @@ func (r *Runtime) common_eval(name, src string, direct, strict bool) Value {
 		panic(err)
 	}
 
-	vm.setPrg(p)
+	vm.profileTicks()
+	vm.prg = p
 	vm.pc = 0
 	vm.args = 0
 	vm.result = _undefined
@@ -1522,7 +1523,8 @@ func (r *Runtime) RunProgram(p *Program) (result Value, err error) {
 		vm.stash = &r.global.stash
 		vm.sb = vm.sp - 1
 	}
-	vm.setPrg(p)
+	vm.profileTicks()
+	vm.prg = p
 	vm.pc = 0
 	vm.result = _undefined
 	ex := vm.runTry(r.vm.ctx)
@@ -1537,7 +1539,8 @@ func (r *Runtime) RunProgram(p *Program) (result Value, err error) {
 		vm.clearStack()
 	} else {
 		vm.stack = nil
-		vm.setPrg(nil)
+		vm.profileTicks()
+		vm.prg = nil
 		vm.setFuncName("")
 		r.leave()
 	}

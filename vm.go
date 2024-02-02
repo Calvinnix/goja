@@ -314,7 +314,8 @@ type instruction interface {
 	exec(*vm)
 }
 
-func (vm *vm) setPrg(prg *Program) {
+// profileTicks tracks the ticks for the current Program, this should be called prior to updating the program (i.e. vm.prg = p)
+func (vm *vm) profileTicks() {
 	if vm.r.functionTickTrackingEnabled {
 		currentTicks := vm.r.Ticks()
 		if vm.prg != nil {
@@ -329,7 +330,6 @@ func (vm *vm) setPrg(prg *Program) {
 		}
 		vm.lastFunctionTicks = currentTicks
 	}
-	vm.prg = prg
 }
 
 func (vm *vm) getFuncName() unistring.String {
@@ -886,9 +886,9 @@ func (vm *vm) pushCtx() {
 }
 
 func (vm *vm) restoreCtx(ctx *vmContext) {
-	vm.stash, vm.privEnv, vm.newTarget, vm.result, vm.pc, vm.sb, vm.args =
-		ctx.stash, ctx.privEnv, ctx.newTarget, ctx.result, ctx.pc, ctx.sb, ctx.args
-	vm.setPrg(ctx.prg)
+	vm.profileTicks()
+	vm.prg, vm.stash, vm.privEnv, vm.newTarget, vm.result, vm.pc, vm.sb, vm.args =
+		ctx.prg, ctx.stash, ctx.privEnv, ctx.newTarget, ctx.result, ctx.pc, ctx.sb, ctx.args
 
 	vm.ctx = ctx.ctx
 	vm.setFuncName(ctx.funcName)
@@ -3415,7 +3415,8 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.setPrg(f.prg)
+		vm.profileTicks()
+		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3425,7 +3426,8 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.setPrg(f.prg)
+		vm.profileTicks()
+		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3435,7 +3437,8 @@ func (numargs call) exec(vm *vm) {
 		vm.pc++
 		vm.pushCtx()
 		vm.args = n
-		vm.setPrg(f.prg)
+		vm.profileTicks()
+		vm.prg = f.prg
 		vm.stash = f.stash
 		vm.privEnv = f.privEnv
 		vm.pc = 0
@@ -3450,7 +3453,8 @@ func (numargs call) exec(vm *vm) {
 		vm._nativeCall(&f.nativeFuncObject, n)
 	case *proxyObject:
 		vm.pushCtx()
-		vm.setPrg(nil)
+		vm.profileTicks()
+		vm.prg = nil
 		vm.setFuncName("proxy")
 		ret := f.apply(FunctionCall{ctx: vm.ctx, This: vm.stack[vm.sp-n-2], Arguments: vm.stack[vm.sp-n : vm.sp]})
 		if ret == nil {
@@ -3470,7 +3474,8 @@ func (numargs call) exec(vm *vm) {
 func (vm *vm) _nativeCall(f *nativeFuncObject, n int) {
 	if f.f != nil {
 		vm.pushCtx()
-		vm.setPrg(nil)
+		vm.profileTicks()
+		vm.prg = nil
 		vm.setFuncName(nilSafe(f.getStr("name", nil)).string())
 		ret := f.f(FunctionCall{
 			ctx:       vm.ctx,
