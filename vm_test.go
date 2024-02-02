@@ -597,10 +597,10 @@ func TestStashMemUsage(t *testing.T) {
 
 func TestTickTracking(t *testing.T) {
 	tests := []struct {
-		name                        string
-		script                      string
-		functionTickTrackingEnabled bool
-		expectedTickMetricsKeys     []string
+		name                      string
+		script                    string
+		tickMetricTrackingEnabled bool
+		expectedTickMetricsKeys   []string
 	}{
 		{
 			name: "should track looping function ticks when tick tracking is enabled",
@@ -611,8 +611,8 @@ func TestTickTracking(t *testing.T) {
 				}
 				f()
 			`,
-			functionTickTrackingEnabled: true,
-			expectedTickMetricsKeys:     []string{"test.js.", "test.js.f"},
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys:   []string{"test.js.", "test.js.f"},
 		},
 		{
 			name: "should track larger looping function ticks when tick tracking is enabled",
@@ -623,8 +623,8 @@ func TestTickTracking(t *testing.T) {
 				}
 				f()
 			`,
-			functionTickTrackingEnabled: true,
-			expectedTickMetricsKeys:     []string{"test.js.", "test.js.f"},
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys:   []string{"test.js.", "test.js.f"},
 		},
 		{
 			name: "should track fib function ticks when tick tracking is enabled",
@@ -635,8 +635,8 @@ func TestTickTracking(t *testing.T) {
 				}
 				fib(35);
 			`,
-			functionTickTrackingEnabled: true,
-			expectedTickMetricsKeys:     []string{"test.js.", "test.js.fib"},
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys:   []string{"test.js.", "test.js.fib"},
 		},
 		{
 			name: "should not track function ticks when tick tracking is disabled",
@@ -647,15 +647,57 @@ func TestTickTracking(t *testing.T) {
 				}
 				f()
 			`,
-			functionTickTrackingEnabled: false,
-			expectedTickMetricsKeys:     []string{},
+			tickMetricTrackingEnabled: false,
+			expectedTickMetricsKeys:   []string{},
+		},
+		{
+			name: "should track ticks from a class method",
+			script: `
+				class Car {
+					constructor(brand) {
+						this.brand = brand;
+					}
+
+					drive() {}
+					honk() {}
+				}
+				const car = new Car("Tesla")
+				car.drive()
+				car.honk()
+			`,
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys:   []string{"test.js.", "test.js.drive", "test.js.honk"},
+		},
+		{
+			name: "should track ticks from nested functions",
+			script: `
+				function outerFunction() {
+					function firstNestedFunction() {
+						function secondNestedFunction() {
+							function thirdNestedFunction() {}
+							thirdNestedFunction();
+						}
+						secondNestedFunction();
+					}
+					firstNestedFunction();
+				}
+				outerFunction();
+			`,
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys: []string{
+				"test.js.",
+				"test.js.outerFunction",
+				"test.js.firstNestedFunction",
+				"test.js.secondNestedFunction",
+				"test.js.thirdNestedFunction",
+			},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			vm := New()
-			if tc.functionTickTrackingEnabled {
+			if tc.tickMetricTrackingEnabled {
 				vm.EnableTickMetricTracking()
 			}
 
