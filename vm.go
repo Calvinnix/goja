@@ -323,7 +323,7 @@ func (vm *vm) profileTicks() {
 	if vm.prg != nil {
 		function := string(vm.prg.funcName)
 		if vm.prg.src != nil {
-			function = vm.prg.src.Name() + "." + function
+			function = vm.prg.src.Name() + "::" + function
 		}
 		vm.r.tickMetrics[function] += currentTicks - vm.lastFunctionTicks
 	}

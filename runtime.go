@@ -3236,10 +3236,14 @@ func (r *Runtime) getPrototypeFromCtor(newTarget, defCtor, defProto *Object) *Ob
 	return defProto
 }
 
+// EnableTickMetricTracking sets tickMetricTrackingEnabled to true. tickMetricTrackingEnabled is checked during every
+// profileTick call so this would effectively enable tick tracking immediately.
 func (self *Runtime) EnableTickMetricTracking() {
 	self.tickMetricTrackingEnabled = true
 }
 
+// DisableTickMetricTracking sets tickMetricTrackingEnabled to false. tickMetricTrackingEnabled is checked during every
+// profileTick call so this would effectively disable tick tracking immediately.
 func (self *Runtime) DisableTickMetricTracking() {
 	self.tickMetricTrackingEnabled = false
 }

@@ -612,7 +612,7 @@ func TestTickTracking(t *testing.T) {
 				f()
 			`,
 			tickMetricTrackingEnabled: true,
-			expectedTickMetricsKeys:   []string{"test.js.", "test.js.f"},
+			expectedTickMetricsKeys:   []string{"test.js::", "test.js::f"},
 		},
 		{
 			name: "should track larger looping function ticks when tick tracking is enabled",
@@ -624,7 +624,7 @@ func TestTickTracking(t *testing.T) {
 				f()
 			`,
 			tickMetricTrackingEnabled: true,
-			expectedTickMetricsKeys:   []string{"test.js.", "test.js.f"},
+			expectedTickMetricsKeys:   []string{"test.js::", "test.js::f"},
 		},
 		{
 			name: "should track fib function ticks when tick tracking is enabled",
@@ -636,7 +636,7 @@ func TestTickTracking(t *testing.T) {
 				fib(35);
 			`,
 			tickMetricTrackingEnabled: true,
-			expectedTickMetricsKeys:   []string{"test.js.", "test.js.fib"},
+			expectedTickMetricsKeys:   []string{"test.js::", "test.js::fib"},
 		},
 		{
 			name: "should not track function ticks when tick tracking is disabled",
@@ -666,7 +666,7 @@ func TestTickTracking(t *testing.T) {
 				car.honk()
 			`,
 			tickMetricTrackingEnabled: true,
-			expectedTickMetricsKeys:   []string{"test.js.", "test.js.drive", "test.js.honk"},
+			expectedTickMetricsKeys:   []string{"test.js::", "test.js::drive", "test.js::honk"},
 		},
 		{
 			name: "should track ticks from nested functions",
@@ -685,11 +685,11 @@ func TestTickTracking(t *testing.T) {
 			`,
 			tickMetricTrackingEnabled: true,
 			expectedTickMetricsKeys: []string{
-				"test.js.",
-				"test.js.outerFunction",
-				"test.js.firstNestedFunction",
-				"test.js.secondNestedFunction",
-				"test.js.thirdNestedFunction",
+				"test.js::",
+				"test.js::outerFunction",
+				"test.js::firstNestedFunction",
+				"test.js::secondNestedFunction",
+				"test.js::thirdNestedFunction",
 			},
 		},
 	}
