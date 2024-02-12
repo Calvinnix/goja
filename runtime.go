@@ -492,6 +492,10 @@ func (r *Runtime) init() {
 	}
 	r.vm.init()
 
+	// Initializing tickMetrics by default to avoid complexities when trying to enable tick tracking with
+	// vm.EnableFunctionTickTracking(). The problem here is we need to have the vm object in order to enable tick tracking,
+	// but we check whether tick tracking is enabled when we create the vm object.
+	// It is simpler, and not costly, to just have this map always initialized.
 	r.tickMetrics = make(map[string]uint64)
 
 	r.SetRateLimiter(rate.NewLimiter(rate.Inf, maxInt))

@@ -692,6 +692,22 @@ func TestTickTracking(t *testing.T) {
 				"test.js::thirdNestedFunction",
 			},
 		},
+		{
+			name: "should track ticks even when a function throws an error",
+			script: `
+				function explode() {
+					throw new Error("boom");
+				}
+				try {
+					explode()
+				} catch (err) {}
+			`,
+			tickMetricTrackingEnabled: true,
+			expectedTickMetricsKeys: []string{
+				"test.js::",
+				"test.js::explode",
+			},
+		},
 	}
 
 	for _, tc := range tests {
