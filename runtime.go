@@ -214,7 +214,7 @@ func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
-// LimiterWaitCount is a counter that tracks the amount of times WaitN was called.This happens when limiterTicksLeft
+// LimiterWaitCount is a counter that tracks the amount of times WaitN was called. This happens when limiterTicksLeft
 // hits 0, and we throttle the function execution.
 func (self *Runtime) LimiterWaitCount() uint64 {
 	return self.limiterWaitCount
