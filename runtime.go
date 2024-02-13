@@ -203,6 +203,7 @@ type Runtime struct {
 
 	limiter          *rate.Limiter
 	limiterTicksLeft int
+	limiterWaitCount uint64
 	ticks            uint64
 
 	tickMetricTrackingEnabled bool
@@ -211,6 +212,10 @@ type Runtime struct {
 
 func (self *Runtime) Ticks() uint64 {
 	return self.ticks
+}
+
+func (self *Runtime) LimiterWaitCount() uint64 {
+	return self.limiterWaitCount
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that

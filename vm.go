@@ -617,6 +617,7 @@ func (vm *vm) run() {
 				ctx = context.Background()
 			}
 
+			vm.r.limiterWaitCount++
 			if waitErr := vm.r.limiter.WaitN(ctx, vm.r.limiterTicksLeft); waitErr != nil {
 				if vm.r.vm.ctx == nil {
 					panic(waitErr)
