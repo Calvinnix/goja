@@ -353,13 +353,6 @@ func intToValue(i int64) Value {
 	return valueFloat(i)
 }
 
-func int64ToValue(i int64) Value {
-	if i >= -128 && i <= 127 {
-		return int64Cache[i+128]
-	}
-	return valueInt64(i)
-}
-
 func floatToInt(f float64) (result int64, ok bool) {
 	if (f != 0 || !math.Signbit(f)) && !math.IsInf(f, 0) && f == math.Trunc(f) && f >= -maxInt && f <= maxInt {
 		return int64(f), true
@@ -387,9 +380,6 @@ func assertInt64(v Value) (int64, bool) {
 	num := v.ToNumber()
 	if i, ok := num.(valueInt); ok {
 		return int64(i), true
-	}
-	if _, ok := num.(valueInt64); ok {
-		return v.ToInt64(), true
 	}
 	if f, ok := num.(valueFloat); ok {
 		if i, ok := floatToInt(float64(f)); ok {
@@ -1246,12 +1236,6 @@ func (_add) exec(vm *vm) {
 			} else {
 				ret = floatToValue(float64(leftInt) + right.ToFloat())
 			}
-		} else if leftInt, ok := left.(valueInt64); ok {
-			if rightInt, ok := right.(valueInt64); ok {
-				ret = int64ToValue(int64(leftInt) + int64(rightInt))
-			} else {
-				ret = floatToValue(float64(leftInt) + right.ToFloat())
-			}
 		} else {
 			ret = floatToValue(left.ToFloat() + right.ToFloat())
 		}
@@ -1275,12 +1259,6 @@ func (_sub) exec(vm *vm) {
 	if left, ok := left.(valueInt); ok {
 		if right, ok := right.(valueInt); ok {
 			result = intToValue(int64(left) - int64(right))
-			goto end
-		}
-	}
-	if left, ok := left.(valueInt64); ok {
-		if right, ok := right.(valueInt64); ok {
-			result = int64ToValue(int64(left) - int64(right))
 			goto end
 		}
 	}
@@ -4232,12 +4210,6 @@ func cmp(px, py Value) Value {
 			goto end
 		}
 	}
-	if xi, ok := px.(valueInt64); ok {
-		if yi, ok := py.(valueInt64); ok {
-			ret = xi < yi
-			goto end
-		}
-	}
 
 	nx = px.ToFloat()
 	ny = py.ToFloat()
@@ -4608,7 +4580,7 @@ func (_typeof) exec(vm *vm) {
 		r = stringBoolean
 	case valueString:
 		r = stringString
-	case valueInt, valueFloat, valueNumber, valueInt32, valueInt64, valueUInt32:
+	case valueInt, valueFloat, valueNumber, valueInt32, valueUInt32:
 		r = stringNumber
 	case *Symbol:
 		r = stringSymbol

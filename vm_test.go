@@ -1,7 +1,6 @@
 package goja
 
 import (
-	"math"
 	"testing"
 
 	"github.com/dop251/goja/parser"
@@ -327,27 +326,6 @@ func TestIntToValue(t *testing.T) {
 		},
 	} {
 		actual := intToValue(tc.i)
-		if tc.expected != actual {
-			t.Fatalf("%v is not equal to %v", actual, tc.expected)
-		}
-	}
-}
-
-func TestInt64ToValue(t *testing.T) {
-	for _, tc := range []struct {
-		i        int64
-		expected Value
-	}{
-		{
-			9223372036854775807,
-			valueInt64(9223372036854775807),
-		},
-		{
-			math.MaxInt64,
-			valueInt64(math.MaxInt64),
-		},
-	} {
-		actual := int64ToValue(tc.i)
 		if tc.expected != actual {
 			t.Fatalf("%v is not equal to %v", actual, tc.expected)
 		}

@@ -3181,7 +3181,7 @@ func (c *compiler) compileNumberLiteral(v *ast.NumberLiteral) compiledExpr {
 	case int:
 		val = intToValue(int64(num))
 	case int64:
-		val = int64ToValue(num)
+		val = intToValue(num)
 	case float64:
 		val = floatToValue(num)
 	default:

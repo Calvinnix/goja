@@ -12,12 +12,6 @@ func TestIntSameAsInt(t *testing.T) {
 	}
 }
 
-func TestIntStrictEqualsInt64(t *testing.T) {
-	if !valueInt(5).StrictEquals(valueInt64(5)) {
-		t.Fatal("values are not equal")
-	}
-}
-
 func TestIntStrictEqualsFloat(t *testing.T) {
 	if !valueInt(5).StrictEquals(valueFloat(5.0)) {
 		t.Fatal("values are not equal")

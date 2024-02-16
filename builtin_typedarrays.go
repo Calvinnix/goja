@@ -38,9 +38,6 @@ func (ctx *typedArraySortCtx) Less(i, j int) bool {
 		if i, ok := res.(valueInt); ok {
 			return i < 0
 		}
-		if i, ok := res.(valueInt64); ok {
-			return i < 0
-		}
 		f := res.ToFloat()
 		if f < 0 {
 			return true
@@ -1256,11 +1253,6 @@ func (r *Runtime) typedArrayCreate(ctor *Object, args ...Value) *typedArrayObjec
 		ta.viewedArrayBuf.ensureNotDetached(true)
 		if len(args) == 1 {
 			if l, ok := args[0].(valueInt); ok {
-				if ta.length < int(l) {
-					panic(r.NewTypeError("Derived TypedArray constructor created an array which was too small"))
-				}
-			}
-			if l, ok := args[0].(valueInt64); ok {
 				if ta.length < int(l) {
 					panic(r.NewTypeError("Derived TypedArray constructor created an array which was too small"))
 				}

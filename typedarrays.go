@@ -161,9 +161,6 @@ func (a *uint8Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
 		return i >= 0 && i <= 255
 	}
-	if i, ok := v.(valueInt64); ok {
-		return i >= 0 && i <= 255
-	}
 	return false
 }
 
@@ -197,9 +194,6 @@ func (a *uint8ClampedArray) swap(i, j int) {
 
 func (a *uint8ClampedArray) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
-		return i >= 0 && i <= 255
-	}
-	if i, ok := v.(valueInt64); ok {
 		return i >= 0 && i <= 255
 	}
 	return false
@@ -237,9 +231,6 @@ func (a *int8Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
 		return i >= math.MinInt8 && i <= math.MaxInt8
 	}
-	if i, ok := v.(valueInt64); ok {
-		return i >= math.MinInt8 && i <= math.MaxInt8
-	}
 	return false
 }
 
@@ -273,9 +264,6 @@ func (a *uint16Array) swap(i, j int) {
 
 func (a *uint16Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
-		return i >= 0 && i <= math.MaxUint16
-	}
-	if i, ok := v.(valueInt64); ok {
 		return i >= 0 && i <= math.MaxUint16
 	}
 	return false
@@ -313,9 +301,6 @@ func (a *int16Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
 		return i >= math.MinInt16 && i <= math.MaxInt16
 	}
-	if i, ok := v.(valueInt64); ok {
-		return i >= math.MinInt16 && i <= math.MaxInt16
-	}
 	return false
 }
 
@@ -351,9 +336,6 @@ func (a *uint32Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
 		return i >= 0 && i <= math.MaxUint32
 	}
-	if i, ok := v.(valueInt64); ok {
-		return i >= 0 && i <= math.MaxUint32
-	}
 	return false
 }
 
@@ -387,9 +369,6 @@ func (a *int32Array) swap(i, j int) {
 
 func (a *int32Array) typeMatch(v Value) bool {
 	if i, ok := v.(valueInt); ok {
-		return i >= math.MinInt32 && i <= math.MaxInt32
-	}
-	if i, ok := v.(valueInt64); ok {
 		return i >= math.MinInt32 && i <= math.MaxInt32
 	}
 	return false
@@ -439,7 +418,7 @@ func (a *float32Array) swap(i, j int) {
 
 func (a *float32Array) typeMatch(v Value) bool {
 	switch v.(type) {
-	case valueInt, valueFloat, valueInt64:
+	case valueInt, valueFloat:
 		return true
 	}
 	return false
@@ -475,7 +454,7 @@ func (a *float64Array) swap(i, j int) {
 
 func (a *float64Array) typeMatch(v Value) bool {
 	switch v.(type) {
-	case valueInt, valueFloat, valueInt64:
+	case valueInt, valueFloat:
 		return true
 	}
 	return false

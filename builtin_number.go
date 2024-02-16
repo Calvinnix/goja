@@ -9,7 +9,7 @@ import (
 
 func (r *Runtime) toNumber(v Value) Value {
 	switch t := v.(type) {
-	case valueFloat, valueInt, valueInt64:
+	case valueFloat, valueInt:
 		return v
 	case *Object:
 		switch t := t.self.(type) {
@@ -34,7 +34,7 @@ func (r *Runtime) numberproto_valueOf(call FunctionCall) Value {
 func (r *Runtime) numberproto_toString(call FunctionCall) Value {
 	var numVal Value
 	switch t := call.This.(type) {
-	case valueFloat, valueInt, valueInt64:
+	case valueFloat, valueInt:
 		numVal = t
 	case *Object:
 		switch t := t.self.(type) {
@@ -158,8 +158,6 @@ func (r *Runtime) number_isFinite(call FunctionCall) Value {
 	switch arg := call.Argument(0).(type) {
 	case valueInt:
 		return valueTrue
-	case valueInt64:
-		return valueTrue
 	case valueFloat:
 		f := float64(arg)
 		return r.toBoolean(!math.IsInf(f, 0) && !math.IsNaN(f))
@@ -171,8 +169,6 @@ func (r *Runtime) number_isFinite(call FunctionCall) Value {
 func (r *Runtime) number_isInteger(call FunctionCall) Value {
 	switch arg := call.Argument(0).(type) {
 	case valueInt:
-		return valueTrue
-	case valueInt64:
 		return valueTrue
 	case valueFloat:
 		f := float64(arg)
@@ -195,9 +191,6 @@ func (r *Runtime) number_isSafeInteger(call FunctionCall) Value {
 		return valueTrue
 	}
 	if arg == _negativeZero {
-		return valueTrue
-	}
-	if i, ok := arg.(valueInt64); ok && i >= -(maxInt-1) && i <= maxInt-1 {
 		return valueTrue
 	}
 	// valueFloat can come in from other nativefuncs like math_abs, this will make sure that the valueFloat is a valid integer

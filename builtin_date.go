@@ -31,8 +31,6 @@ func (r *Runtime) makeDate(args []Value, utc bool) (t time.Time, valid bool) {
 			var n int64
 			if i, ok := pv.(valueInt); ok {
 				n = int64(i)
-			} else if i, ok := pv.(valueInt64); ok {
-				n = int64(i)
 			} else if f, ok := pv.(valueFloat); ok {
 				f := float64(f)
 				if math.IsNaN(f) || math.IsInf(f, 0) {

@@ -17,16 +17,6 @@ func TestNumberEquality(t *testing.T) {
 	}
 }
 
-func TestInt64StrictEqualsFloat(t *testing.T) {
-	if !valueInt64(5).StrictEquals(valueFloat(5.0)) {
-		t.Fatal("values are not equal")
-	}
-
-	if !valueInt64(0).StrictEquals(valueFloat(0.0)) {
-		t.Fatal("values are not equal")
-	}
-}
-
 func TestIntStringEquality(t *testing.T) {
 	vm := New()
 
@@ -73,12 +63,6 @@ func TestAddedValuesMemUsage(t *testing.T) {
 			val:            valueInt32(1),
 			expectedMem:    SizeInt32,
 			expectedNewMem: SizeInt32,
-		},
-		{
-			name:           "should have memory usage of SizeNumber given a non-empty valueInt64",
-			val:            valueInt64(1),
-			expectedMem:    SizeNumber,
-			expectedNewMem: SizeNumber,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

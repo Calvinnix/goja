@@ -1053,9 +1053,6 @@ func toInt8(v Value) int8 {
 	if i, ok := v.(valueInt); ok {
 		return int8(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return int8(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1071,9 +1068,6 @@ func toUint8(v Value) uint8 {
 	if i, ok := v.(valueInt); ok {
 		return uint8(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return uint8(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1087,15 +1081,6 @@ func toUint8(v Value) uint8 {
 func toUint8Clamp(v Value) uint8 {
 	v = v.ToNumber()
 	if i, ok := v.(valueInt); ok {
-		if i < 0 {
-			return 0
-		}
-		if i <= 255 {
-			return uint8(i)
-		}
-		return 255
-	}
-	if i, ok := v.(valueInt64); ok {
 		if i < 0 {
 			return 0
 		}
@@ -1137,9 +1122,6 @@ func toInt16(v Value) int16 {
 	if i, ok := v.(valueInt); ok {
 		return int16(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return int16(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1153,9 +1135,6 @@ func toInt16(v Value) int16 {
 func toUint16(v Value) uint16 {
 	v = v.ToNumber()
 	if i, ok := v.(valueInt); ok {
-		return uint16(i)
-	}
-	if i, ok := v.(valueInt64); ok {
 		return uint16(i)
 	}
 
@@ -1173,9 +1152,6 @@ func toInt32(v Value) int32 {
 	if i, ok := v.(valueInt); ok {
 		return int32(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return int32(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1189,9 +1165,6 @@ func toInt32(v Value) int32 {
 func toUint32(v Value) uint32 {
 	v = v.ToNumber()
 	if i, ok := v.(valueInt); ok {
-		return uint32(i)
-	}
-	if i, ok := v.(valueInt64); ok {
 		return uint32(i)
 	}
 
@@ -1209,9 +1182,6 @@ func toInt64(v Value) int64 {
 	if i, ok := v.(valueInt); ok {
 		return int64(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return int64(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1225,9 +1195,6 @@ func toInt64(v Value) int64 {
 func toUint64(v Value) uint64 {
 	v = v.ToNumber()
 	if i, ok := v.(valueInt); ok {
-		return uint64(i)
-	}
-	if i, ok := v.(valueInt64); ok {
 		return uint64(i)
 	}
 
@@ -1245,9 +1212,6 @@ func toInt(v Value) int {
 	if i, ok := v.(valueInt); ok {
 		return int(i)
 	}
-	if i, ok := v.(valueInt64); ok {
-		return int(i)
-	}
 
 	if f, ok := v.(valueFloat); ok {
 		f := float64(f)
@@ -1261,9 +1225,6 @@ func toInt(v Value) int {
 func toUint(v Value) uint {
 	v = v.ToNumber()
 	if i, ok := v.(valueInt); ok {
-		return uint(i)
-	}
-	if i, ok := v.(valueInt64); ok {
 		return uint(i)
 	}
 
@@ -1894,7 +1855,7 @@ func (r *Runtime) toValue(i interface{}, origValue reflect.Value) Value {
 	case int32:
 		return intToValue(int64(i))
 	case int64:
-		return int64ToValue(i)
+		return intToValue(i)
 	case time.Time:
 		// DIVERSION/DISCLAIMER:
 		// Handling of time.Time from maintainers of goja
