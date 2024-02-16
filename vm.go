@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/dop251/goja/unistring"
 )
@@ -617,7 +618,7 @@ func (vm *vm) run() {
 				ctx = context.Background()
 			}
 
-			vm.r.limiterWaitCount++
+			start := time.Now()
 			if waitErr := vm.r.limiter.WaitN(ctx, vm.r.limiterTicksLeft); waitErr != nil {
 				if vm.r.vm.ctx == nil {
 					panic(waitErr)
@@ -629,6 +630,14 @@ func (vm *vm) run() {
 					panic(context.DeadlineExceeded)
 				}
 				panic(waitErr)
+			}
+			timeWaited := time.Since(start).Nanoseconds()
+			// We are only tracking that a "wait" occurred when the time waited is above 10k nanoseconds. This is to
+			// account for the overhead it takes to actually call the WaitN function.
+			// I've observed that WaitN takes ~1000 nanoseconds, but I've included a buffer.
+			if timeWaited > 10_000 {
+				vm.r.limiterWaitCount++
+				vm.r.limiterWaitTotalTime += timeWaited
 			}
 		}
 

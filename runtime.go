@@ -203,8 +203,10 @@ type Runtime struct {
 
 	limiter          *rate.Limiter
 	limiterTicksLeft int
-	limiterWaitCount uint64
 	ticks            uint64
+
+	limiterWaitCount     int64
+	limiterWaitTotalTime int64
 
 	tickMetricTrackingEnabled bool
 	tickMetrics               map[string]uint64
@@ -214,10 +216,14 @@ func (self *Runtime) Ticks() uint64 {
 	return self.ticks
 }
 
-// LimiterWaitCount is a counter that tracks the amount of times WaitN was called. This happens when limiterTicksLeft
-// hits 0, and we throttle the function execution.
-func (self *Runtime) LimiterWaitCount() uint64 {
+// LimiterWaitCount tracks the amount of times the rate limiter throttles the execution.
+func (self *Runtime) LimiterWaitCount() int64 {
 	return self.limiterWaitCount
+}
+
+// LimiterWaitTotalTime tracks the total amount of time, in nanoseconds, that the execution was throttled.
+func (self *Runtime) LimiterWaitTotalTime() int64 {
+	return self.limiterWaitTotalTime
 }
 
 // SetStackTraceLimit sets an upper limit to the number of stack frames that
