@@ -618,26 +618,22 @@ func (vm *vm) run() {
 				ctx = context.Background()
 			}
 
-			start := time.Now()
-			if waitErr := vm.r.limiter.WaitN(ctx, vm.r.limiterTicksLeft); waitErr != nil {
-				if vm.r.vm.ctx == nil {
-					panic(waitErr)
-				}
-				if ctxErr := vm.r.vm.ctx.Err(); ctxErr != nil {
-					panic(ctxErr)
-				}
-				if strings.Contains(waitErr.Error(), "would exceed") {
-					panic(context.DeadlineExceeded)
-				}
-				panic(waitErr)
+			now := time.Now()
+			r := vm.r.limiter.ReserveN(now, vm.r.limiterTicksLeft)
+			if !r.OK() {
+				panic("failed to make reservation")
 			}
-			timeWaited := time.Since(start).Nanoseconds()
-			// We are only tracking that a "wait" occurred when the time waited is above 10k nanoseconds. This is to
-			// account for the overhead it takes to actually call the WaitN function.
-			// I've observed that WaitN takes ~1000 nanoseconds, but I've included a buffer.
-			if timeWaited > 10_000 {
+
+			delay := r.DelayFrom(now)
+			if delay > 0 {
 				vm.r.limiterWaitCount++
-				vm.r.limiterWaitTotalTime += timeWaited
+				vm.r.limiterWaitTotalTime += delay.Nanoseconds()
+
+				err := sleep(ctx, delay)
+				if err != nil {
+					r.Cancel()
+					panic(err)
+				}
 			}
 		}
 
@@ -5615,4 +5611,16 @@ func (s valueStack) MemUsage(ctx *MemUsageContext) (memUsage uint64, newMemUsage
 	}
 
 	return memUsage, newMemUsage, nil
+}
+
+// sleep is equivalent to time.Sleep, but is interruptible via context cancelation.
+func sleep(ctx context.Context, duration time.Duration) error {
+	timer := time.NewTimer(duration)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }
