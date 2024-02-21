@@ -629,8 +629,7 @@ func (vm *vm) run() {
 				vm.r.limiterWaitCount++
 				vm.r.limiterWaitTotalTime += delay
 
-				err := sleep(ctx, delay)
-				if err != nil {
+				if err := sleep(ctx, delay); err != nil {
 					r.Cancel()
 					panic(err)
 				}
