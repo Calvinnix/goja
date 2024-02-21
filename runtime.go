@@ -206,7 +206,7 @@ type Runtime struct {
 	ticks            uint64
 
 	limiterWaitCount     int64
-	limiterWaitTotalTime int64
+	limiterWaitTotalTime time.Duration
 
 	tickMetricTrackingEnabled bool
 	tickMetrics               map[string]uint64
@@ -221,8 +221,8 @@ func (self *Runtime) LimiterWaitCount() int64 {
 	return self.limiterWaitCount
 }
 
-// LimiterWaitTotalTime tracks the total amount of time, in nanoseconds, that the execution was throttled.
-func (self *Runtime) LimiterWaitTotalTime() int64 {
+// LimiterWaitTotalTime tracks the total amount of time that the execution was throttled.
+func (self *Runtime) LimiterWaitTotalTime() time.Duration {
 	return self.limiterWaitTotalTime
 }
 

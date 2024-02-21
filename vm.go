@@ -627,7 +627,7 @@ func (vm *vm) run() {
 			delay := r.DelayFrom(now)
 			if delay > 0 {
 				vm.r.limiterWaitCount++
-				vm.r.limiterWaitTotalTime += delay.Nanoseconds()
+				vm.r.limiterWaitTotalTime += delay
 
 				err := sleep(ctx, delay)
 				if err != nil {
