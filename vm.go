@@ -624,8 +624,7 @@ func (vm *vm) run() {
 				panic("failed to make reservation")
 			}
 
-			delay := r.DelayFrom(now)
-			if delay > 0 {
+			if delay := r.DelayFrom(now); delay > 0 {
 				vm.r.limiterWaitCount++
 				vm.r.limiterWaitTotalTime += delay
 
