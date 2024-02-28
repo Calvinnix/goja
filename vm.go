@@ -618,6 +618,12 @@ func (vm *vm) run() {
 				ctx = context.Background()
 			}
 
+			select {
+			case <-ctx.Done():
+				panic(ctx.Err())
+			default:
+			}
+
 			now := time.Now()
 			r := vm.r.limiter.ReserveN(now, vm.r.limiterTicksLeft)
 			if !r.OK() {
@@ -632,11 +638,6 @@ func (vm *vm) run() {
 					r.Cancel()
 					panic(err)
 				}
-			}
-			select {
-			case <-ctx.Done():
-				panic(ctx.Err())
-			default:
 			}
 		}
 
