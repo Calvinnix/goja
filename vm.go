@@ -633,6 +633,11 @@ func (vm *vm) run() {
 					panic(err)
 				}
 			}
+			select {
+			case <-ctx.Done():
+				panic(ctx.Err())
+			default:
+			}
 		}
 
 		if interrupted = atomic.LoadUint32(&vm.interrupted) != 0; interrupted {
