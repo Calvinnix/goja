@@ -621,7 +621,7 @@ func (vm *vm) run() {
 			now := time.Now()
 			r := vm.r.limiter.ReserveN(now, vm.r.limiterTicksLeft)
 			if !r.OK() {
-				panic("failed to make reservation")
+				panic(context.DeadlineExceeded)
 			}
 
 			if delay := r.DelayFrom(now); delay > 0 {
