@@ -58,6 +58,10 @@ type Object struct {
 	seenObjects map[*Object]bool
 }
 
+func (o *Object) UnsafeAssignRuntime(r *Runtime) {
+	o.runtime = r
+}
+
 func (o *Object) CyclicalCount() int {
 	return o.cyclicalCount
 }
