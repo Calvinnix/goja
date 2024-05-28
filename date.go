@@ -22,6 +22,8 @@ type dateObject struct {
 	baseObject
 	msec    int64
 	invalid bool
+
+	objVisitedForMemoryPollerCount int
 }
 
 type dateLayoutDesc struct {
@@ -168,6 +170,14 @@ func (d *dateObject) time() time.Time {
 
 func (d *dateObject) timeUTC() time.Time {
 	return timeFromMsec(d.msec).In(time.UTC)
+}
+
+func (a *dateObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *dateObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (d *dateObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

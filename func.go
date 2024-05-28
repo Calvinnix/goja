@@ -32,6 +32,7 @@ type funcObjectImpl interface {
 
 type funcObject struct {
 	baseJsFuncObject
+	objVisitedForMemoryPollerCount int
 }
 
 type classFuncObject struct {
@@ -62,6 +63,8 @@ type nativeFuncObject struct {
 
 	f         func(FunctionCall) Value
 	construct func(args []Value, newTarget *Object) *Object
+
+	objVisitedForMemoryPollerCount int
 }
 
 type wrappedFuncObject struct {
@@ -490,6 +493,14 @@ func (f *boundFuncObject) hasInstance(v Value) bool {
 	return instanceOfOperator(v, f.wrapped)
 }
 
+func (a *nativeFuncObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *nativeFuncObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
+}
+
 func (f *nativeFuncObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 	if f == nil || ctx.IsObjVisited(f) {
 		return SizeEmptyStruct, nil
@@ -497,6 +508,14 @@ func (f *nativeFuncObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err 
 	ctx.VisitObj(f)
 
 	return f.baseFuncObject.MemUsage(ctx)
+}
+
+func (a *funcObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *funcObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (f *funcObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

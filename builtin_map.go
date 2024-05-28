@@ -9,6 +9,8 @@ var mapExportType = reflect.TypeOf([][2]interface{}{})
 type mapObject struct {
 	baseObject
 	m *orderedMap
+
+	objVisitedForMemoryPollerCount int
 }
 
 type mapIterObject struct {
@@ -92,6 +94,14 @@ func (mo *mapObject) exportToMap(dst reflect.Value, typ reflect.Type, ctx *objec
 		dst.SetMapIndex(keyVal, elemVal)
 	}
 	return nil
+}
+
+func (a *mapObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *mapObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (mo *mapObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

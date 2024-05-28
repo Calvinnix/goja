@@ -22,6 +22,8 @@ type sparseArrayObject struct {
 	length         uint32
 	propValueCount int
 	lengthProp     valueProperty
+
+	objVisitedForMemoryPollerCount int
 }
 
 func (a *sparseArrayObject) findIdx(idx uint32) int {
@@ -497,6 +499,14 @@ func (a *sparseArrayObject) exportToArrayOrSlice(dst reflect.Value, typ reflect.
 		return nil
 	}
 	return a.baseObject.exportToArrayOrSlice(dst, typ, ctx)
+}
+
+func (a *sparseArrayObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *sparseArrayObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (a *sparseArrayObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

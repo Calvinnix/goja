@@ -191,8 +191,8 @@ func TestArrayObjectMemUsage(t *testing.T) {
 			name: "array limit function undefined throws error",
 			mu: &MemUsageContext{
 				visitTracker: visitTracker{
-					objsVisited:    make(map[objectImpl]struct{}),
-					stashesVisited: make(map[*stash]struct{}),
+					stashesVisited:      make(map[*stash]struct{}),
+					memoryPollerCounter: 1,
 				},
 				depthTracker: &depthTracker{
 					curDepth: 0,

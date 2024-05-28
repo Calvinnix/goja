@@ -292,6 +292,8 @@ type proxyObject struct {
 	handler proxyHandler
 	call    func(FunctionCall) Value
 	ctor    func(args []Value, newTarget *Object) *Object
+
+	objVisitedForMemoryPollerCount int
 }
 
 func (p *proxyObject) checkHandler() proxyHandler {
@@ -1052,6 +1054,14 @@ func (p *proxyObject) export(*objectExportCtx) interface{} {
 func (p *proxyObject) revoke() {
 	p.handler = nil
 	p.target = nil
+}
+
+func (a *proxyObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *proxyObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (p *proxyObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

@@ -119,6 +119,8 @@ type stringObject struct {
 	value      valueString
 	length     int
 	lengthProp valueProperty
+
+	objVisitedForMemoryPollerCount int
 }
 
 func newStringValue(s string) valueString {
@@ -326,6 +328,14 @@ func devirtualizeString(s valueString) (asciiString, unicodeString) {
 
 func unknownStringTypeErr(v Value) interface{} {
 	return newTypeError("Internal bug: unknown string type: %T", v)
+}
+
+func (a *stringObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *stringObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (s *stringObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

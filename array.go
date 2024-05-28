@@ -70,6 +70,8 @@ type arrayObject struct {
 	objCount       int
 	propValueCount int
 	lengthProp     valueProperty
+
+	objVisitedForMemoryPollerCount int
 }
 
 func (a *arrayObject) init() {
@@ -603,6 +605,14 @@ func (a *arrayObject) estimateMemUsage(ctx *MemUsageContext) (estimate uint64, e
 	}
 
 	return estimate, nil
+}
+
+func (a *arrayObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *arrayObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (a *arrayObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

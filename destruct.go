@@ -292,6 +292,13 @@ func (d *destructKeyedSource) getPrivateEnv(typ *privateEnvType, create bool) *p
 	return d.w().getPrivateEnv(typ, create)
 }
 
+func (a *destructKeyedSource) visitObject(_ int) {
+}
+
+func (a *destructKeyedSource) isObjectVisited(_ int) bool {
+	return false
+}
+
 func (d *destructKeyedSource) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 	if d.wrapped == nil {
 		return memUsage, err

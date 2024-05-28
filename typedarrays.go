@@ -28,6 +28,8 @@ type arrayBufferObject struct {
 	baseObject
 	detached bool
 	data     []byte
+
+	objVisitedForMemoryPollerCount int
 }
 
 // ArrayBuffer is a Go wrapper around ECMAScript ArrayBuffer. Calling Runtime.ToValue() on it
@@ -41,6 +43,8 @@ type dataViewObject struct {
 	baseObject
 	viewedArrayBuf      *arrayBufferObject
 	byteLen, byteOffset int
+
+	objVisitedForMemoryPollerCount int
 }
 
 type typedArray interface {
@@ -71,6 +75,8 @@ type typedArrayObject struct {
 	length, offset int
 	elemSize       int
 	typedArray     typedArray
+
+	objVisitedForMemoryPollerCount int
 }
 
 func (a ArrayBuffer) toValue(r *Runtime) Value {
@@ -705,6 +711,14 @@ func (a *typedArrayObject) iterateStringKeys() iterNextFunc {
 	}).next
 }
 
+func (a *typedArrayObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *typedArrayObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
+}
+
 func (a *typedArrayObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 	if a == nil || ctx.IsObjVisited(a) {
 		return SizeEmptyStruct, nil
@@ -810,6 +824,14 @@ func (o *dataViewObject) getIdxAndByteOrder(getIdx int, littleEndianVal Value, s
 		bo = nativeEndian
 	}
 	return getIdx, bo
+}
+
+func (a *dataViewObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *dataViewObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (o *dataViewObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
@@ -968,6 +990,14 @@ func (o *arrayBufferObject) export(*objectExportCtx) interface{} {
 	return ArrayBuffer{
 		buf: o,
 	}
+}
+
+func (a *arrayBufferObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *arrayBufferObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (o *arrayBufferObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

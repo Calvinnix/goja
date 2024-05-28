@@ -265,6 +265,8 @@ type objectImpl interface {
 	getPrivateEnv(typ *privateEnvType, create bool) *privateElements
 
 	MemUsage(ctx *MemUsageContext) (memUsage uint64, err error)
+	isObjectVisited(iter int) bool
+	visitObject(iter int)
 }
 
 type baseObject struct {
@@ -281,6 +283,8 @@ type baseObject struct {
 	symValues *orderedMap
 
 	privateElements map[*privateEnvType]*privateElements
+
+	objVisitedForMemoryPollerCount int
 }
 
 type guardedObject struct {
@@ -291,6 +295,8 @@ type guardedObject struct {
 type primitiveValueObject struct {
 	baseObject
 	pValue Value
+
+	objVisitedForMemoryPollerCount int
 }
 
 func (o *primitiveValueObject) export(*objectExportCtx) interface{} {
@@ -1942,6 +1948,14 @@ func (o *baseObject) estimateMemUsage(ctx *MemUsageContext) (estimate uint64, er
 	return computeMemUsageEstimate(memUsage, samplesVisited, totalProps), nil
 }
 
+func (a *baseObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *baseObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
+}
+
 func (o *baseObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 	if o == nil || ctx.IsObjVisited(o) {
 		return SizeEmptyStruct, nil
@@ -1989,6 +2003,14 @@ func (o *baseObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error)
 	ctx.Ascend()
 
 	return memUsage, nil
+}
+
+func (a *primitiveValueObject) visitObject(iter int) {
+	a.objVisitedForMemoryPollerCount = iter
+}
+
+func (a *primitiveValueObject) isObjectVisited(iter int) bool {
+	return a.objVisitedForMemoryPollerCount == iter
 }
 
 func (o *primitiveValueObject) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {

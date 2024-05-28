@@ -210,6 +210,8 @@ type Runtime struct {
 
 	tickMetricTrackingEnabled bool
 	tickMetrics               map[string]uint64
+
+	memoryPollerCounter int
 }
 
 func (self *Runtime) Ticks() uint64 {
@@ -524,6 +526,7 @@ func (r *Runtime) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 	if r == nil {
 		return SizeEmptyStruct, err
 	}
+	r.memoryPollerCounter++
 
 	if r.globalObject != nil {
 		inc, err := r.globalObject.MemUsage(ctx)
