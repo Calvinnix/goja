@@ -569,6 +569,14 @@ func (r *Runtime) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
 		}
 	}
 
+	if r.vm.tmpValues != nil {
+		inc, err := r.vm.tmpValues.MemUsage(ctx)
+		memUsage += inc
+		if err != nil {
+			return memUsage, err
+		}
+	}
+
 	return memUsage, nil
 }
 

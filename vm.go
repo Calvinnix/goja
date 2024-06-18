@@ -286,6 +286,7 @@ type vm struct {
 	pc           int
 	stack        valueStack
 	sp, sb, args int
+	tmpValues    valueStack
 
 	stash     *stash
 	privEnv   *privateEnv

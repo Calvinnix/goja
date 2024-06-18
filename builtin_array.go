@@ -786,6 +786,7 @@ func (r *Runtime) arrayproto_map(call FunctionCall) Value {
 	if _, stdSrc := o.self.(*arrayObject); stdSrc {
 		if arr, ok := a.self.(*arrayObject); ok {
 			values := make([]Value, length)
+			r.vm.tmpValues = values
 			for k := int64(0); k < length; k++ {
 				idx := valueInt(k)
 				if val := o.self.getIdx(idx, nil); val != nil {
@@ -794,6 +795,7 @@ func (r *Runtime) arrayproto_map(call FunctionCall) Value {
 					values[k] = callbackFn(fc)
 				}
 			}
+			r.vm.tmpValues = nil
 			setArrayValues(arr, values)
 			return a
 		}
