@@ -585,9 +585,9 @@ func TestTmpValuesMemUsage(t *testing.T) {
 		},
 		{
 			name:        "should account for each value given a non-empty tmpValues",
-			val:         []Value{valueInt(99)},
+			val:         []Value{valueInt(99), valueInt(99), valueInt(99), valueInt(99)},
 			memLimit:    100,
-			expectedMem: SizeInt,
+			expectedMem: 4 * SizeInt,
 			errExpected: nil,
 		},
 		{
@@ -601,7 +601,7 @@ func TestTmpValuesMemUsage(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			total, err := ValuesMemUsage(tc.val, NewMemUsageContext(New(), 100, tc.memLimit, 100, 100, 0.1, nil))
+			total, err := valuesMemUsage(tc.val, NewMemUsageContext(New(), 100, tc.memLimit, 100, 100, 0.1, nil))
 			if err != tc.errExpected {
 				t.Fatalf("Unexpected error. Actual: %v Expected: %v", err, tc.errExpected)
 			}

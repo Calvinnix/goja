@@ -5592,10 +5592,10 @@ func (r *getPrivateRefId) exec(vm *vm) {
 }
 
 func (s valueStack) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
-	return ValuesMemUsage(s, ctx)
+	return valuesMemUsage(s, ctx)
 }
 
-func ValuesMemUsage(s []Value, ctx *MemUsageContext) (memUsage uint64, err error) {
+func valuesMemUsage(s []Value, ctx *MemUsageContext) (memUsage uint64, err error) {
 	for _, val := range s {
 		if val == nil {
 			continue
