@@ -786,6 +786,7 @@ func (r *Runtime) arrayproto_map(call FunctionCall) Value {
 	if _, stdSrc := o.self.(*arrayObject); stdSrc {
 		if arr, ok := a.self.(*arrayObject); ok {
 			values := make([]Value, length)
+			// Point tmpValues to the values slice so that we can track the memory usage
 			r.vm.tmpValues = values
 			for k := int64(0); k < length; k++ {
 				idx := valueInt(k)
@@ -795,6 +796,7 @@ func (r *Runtime) arrayproto_map(call FunctionCall) Value {
 					values[k] = callbackFn(fc)
 				}
 			}
+			// Set tmpValues to nil because we no longer need to track the memory usage
 			r.vm.tmpValues = nil
 			setArrayValues(arr, values)
 			return a

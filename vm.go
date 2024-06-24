@@ -286,7 +286,7 @@ type vm struct {
 	pc           int
 	stack        valueStack
 	sp, sb, args int
-	tmpValues    valueStack
+	tmpValues    []Value
 
 	stash     *stash
 	privEnv   *privateEnv
@@ -5592,6 +5592,10 @@ func (r *getPrivateRefId) exec(vm *vm) {
 }
 
 func (s valueStack) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) {
+	return ValuesMemUsage(s, ctx)
+}
+
+func ValuesMemUsage(s []Value, ctx *MemUsageContext) (memUsage uint64, err error) {
 	for _, val := range s {
 		if val == nil {
 			continue

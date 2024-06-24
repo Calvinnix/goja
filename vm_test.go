@@ -561,6 +561,60 @@ func TestStashMemUsage(t *testing.T) {
 	}
 }
 
+func TestTmpValuesMemUsage(t *testing.T) {
+	tests := []struct {
+		name        string
+		val         []Value
+		memLimit    uint64
+		expectedMem uint64
+		errExpected error
+	}{
+		{
+			name:        "should account for no memory usage given an empty tmpValues",
+			val:         []Value{},
+			memLimit:    100,
+			expectedMem: 0,
+			errExpected: nil,
+		},
+		{
+			name:        "should account for no memory usage given a tmpValues with nil",
+			val:         []Value{nil},
+			memLimit:    100,
+			expectedMem: 0,
+			errExpected: nil,
+		},
+		{
+			name:        "should account for each value given a non-empty tmpValues",
+			val:         []Value{valueInt(99)},
+			memLimit:    100,
+			expectedMem: SizeInt,
+			errExpected: nil,
+		},
+		{
+			name:        "should exit early given tmpValues over the memory limit",
+			val:         []Value{valueInt(99), valueInt(99), valueInt(99), valueInt(99)},
+			memLimit:    0,
+			expectedMem: SizeInt,
+			errExpected: nil,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			total, err := ValuesMemUsage(tc.val, NewMemUsageContext(New(), 100, tc.memLimit, 100, 100, 0.1, nil))
+			if err != tc.errExpected {
+				t.Fatalf("Unexpected error. Actual: %v Expected: %v", err, tc.errExpected)
+			}
+			if err != nil && tc.errExpected != nil && err.Error() != tc.errExpected.Error() {
+				t.Fatalf("Errors do not match. Actual: %v Expected: %v", err, tc.errExpected)
+			}
+			if total != tc.expectedMem {
+				t.Fatalf("Unexpected memory return. Actual: %v Expected: %v", total, tc.expectedMem)
+			}
+		})
+	}
+}
+
 func TestTickTracking(t *testing.T) {
 	tests := []struct {
 		name                      string

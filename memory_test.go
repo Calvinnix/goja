@@ -395,6 +395,15 @@ func TestMemCheck(t *testing.T) {
 			expectedSizeDiff: testNativeValueMemUsage +
 				(2 + SizeString), // "nv",
 		},
+		{
+			desc: "array.map function",
+			script: `x = [1,2,3,4,5]
+			x.map(_ => {
+				checkMem();
+				return "a"
+			})`,
+			expectedSizeDiff: 4 * (1 + SizeString),
+		},
 	} {
 		t.Run(fmt.Sprintf(tc.desc), func(t *testing.T) {
 			memChecks := []uint64{}
