@@ -402,6 +402,9 @@ func TestMemCheck(t *testing.T) {
 				checkMem();
 				return "a"
 			})`,
+			// We are calculating memory of 4 "a" strings that are created while this map operation executes. Note that
+			// we don't calculate 5 because the last "a" string isn't created when the last checkMem() is called. This
+			// is expected because we only care that memory is being tracked within the map operation.
 			expectedSizeDiff: 4 * (1 + SizeString),
 		},
 	} {

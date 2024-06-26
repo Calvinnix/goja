@@ -5596,6 +5596,7 @@ func (s valueStack) MemUsage(ctx *MemUsageContext) (memUsage uint64, err error) 
 }
 
 func valuesMemUsage(s []Value, ctx *MemUsageContext) (memUsage uint64, err error) {
+	memUsage += SizeEmptySlice
 	for _, val := range s {
 		if val == nil {
 			continue
